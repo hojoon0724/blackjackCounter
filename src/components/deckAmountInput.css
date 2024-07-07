@@ -1,3 +1,24 @@
-.deck-amount-input-container {
-  margin: 0 auto;
+.deck-amount-label {
+  margin-right: 1ch;
+}
+
+.deck-amount-minus-button,
+.deck-amount-plus-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 1.3rem;
+  min-height: 1.3rem;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 1rem;
+  padding: 2px;
+  margin: 0px;
+}
+
+.deck-amount-input {
+  border: none;
+  height: fit-content;
+  width: 3ch;
+  font-size: 1.3rem;
+  margin: 0 8px;
 }

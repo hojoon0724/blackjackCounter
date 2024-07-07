@@ -1,0 +1,51 @@
+.play-area {
+  height: fit-content;
+  flex-grow: 1;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 8px;
+  justify-content: space-between;
+}
+
+.dealer-container {
+  width: 100%;
+}
+
+.dealer-cards-container {
+  width: 100%;
+  padding: 6px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: center;
+  align-items: center;
+}
+
+.dealer-cards-container > .card {
+  margin: 0 0.75svh;
+}
+
+.player-cards-container {
+  position: relative;
+  height: 21svh;
+  width: 15svh;
+  margin: 0 auto;
+}
+
+.player-cards-container > .card {
+  position: absolute;
+  box-shadow: 1px 1px 4px black;
+  border-radius: 0.8svh;
+}
+
+.player-cards-container > .card:nth-child(2) {
+  transform: translateX(3.5svh) translateY(-3.5svh);
+}
+.player-chip-area {
+  min-height: 5svh;
+  min-width: 5svh;
+  border-radius: 100%;
+  margin: 1svh 1svh;
+  padding: max(1svh, 8px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}

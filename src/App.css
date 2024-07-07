@@ -36,6 +36,22 @@
   flex-direction: column;
 }
 
+.space-between {
+  justify-content: space-between;
+}
+
+.align-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.card {
+  width: 15svh;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

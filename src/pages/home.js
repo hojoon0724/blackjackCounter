@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import cardDeckAssembly from '../components/cardAssembly';
 import shuffleDeck from '../components/shuffleDeck';
-import DeckAmountInput from '../components/deckAmountInput';
 import TopBar from '../components/topBar';
 import BottomBar from '../components/bottomBar';
+import PlayArea from '../components/playArea';
 
 export default function Home() {
   const [deckAmount, setDeckAmount] = useState(6);
@@ -12,9 +12,8 @@ export default function Home() {
 
   return (
     <div className="top flex-column">
-      <TopBar />
-      <p>stuff goes here</p>
-      <DeckAmountInput deckAmount={deckAmount} setDeckAmount={setDeckAmount} />
+      <TopBar deckAmount={deckAmount} setDeckAmount={setDeckAmount} />
+      <PlayArea />
       <BottomBar />
     </div>
   );
