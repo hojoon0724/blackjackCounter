@@ -8,24 +8,32 @@ export default function BottomBar({ mitCount, actions }) {
         <div className="mit-count-value">{mitCount}</div>
       </div>
       <div className="actions-container flex-row">
-        <button disabled={false} className="action-button action-split" onClick={actions.split}>
+        <button disabled={actions.split.disabled} className="action-button action-split" onClick={actions.split.func}>
           Split
         </button>
-        <button disabled={false} className="action-button action-double" onClick={actions.double}>
+        <button
+          disabled={actions.double.disabled}
+          className="action-button action-double"
+          onClick={actions.double.func}
+        >
           Double
         </button>
-        <button disabled={false} className="action-button action-hit" onClick={actions.hit}>
+        <button disabled={actions.hit.disabled} className="action-button action-hit" onClick={actions.hit.func}>
           Hit
         </button>
-        <button disabled={false} className="action-button action-stand" onClick={actions.stand}>
+        <button disabled={actions.stand.disabled} className="action-button action-stand" onClick={actions.stand.func}>
           Stand
         </button>
-        <button disabled={false} className="action-button action-surrender" onClick={actions.surrender}>
+        <button
+          disabled={actions.surrender.disabled}
+          className="action-button action-surrender"
+          onClick={actions.surrender.func}
+        >
           Surrender
         </button>
       </div>
       <div className="deal-button-container flex-row">
-        <button className="deal-button" onClick={actions.deal}>
+        <button className="deal-button" onClick={actions.deal.func}>
           Deal
         </button>
       </div>

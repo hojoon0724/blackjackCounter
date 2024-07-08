@@ -1,3 +1,8 @@
+:root {
+  --card-width: min(150px, 15svh);
+  --card-height: calc(var(--card-width) * (3.5 / 2.5));
+}
+
 .top {
   background-color: #0b280b;
   height: 100svh;
@@ -49,7 +54,7 @@
 }
 
 .card {
-  width: 15svh;
+  width: var(--card-width);
 }
 
 @keyframes App-logo-spin {

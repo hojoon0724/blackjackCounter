@@ -14,22 +14,28 @@ export default function Home() {
   const [playerCards, setPlayerCards] = useState([]);
   const [pile, setPile] = useState([]);
 
+  const [dealButton, setDealButton] = useState(true);
+  const [splitButton, setSplitButton] = useState(true);
+  const [doubleButton, setDoubleButton] = useState(true);
+  const [hitButton, setHitButton] = useState(false);
+  const [standButton, setStandButton] = useState(true);
+  const [surrenderButton, setSurrenderButton] = useState(true);
+
   useEffect(() => {
     let cardDeck = cardDeckAssembly(deckAmount);
     let shuffledDeck = shuffleDeck(cardDeck);
     setPlayingDeck(shuffledDeck);
   }, [deckAmount]);
 
+  // Game Logic Functions
   function deal() {
-    let updatedDealerCards = [...dealerCards];
-    let updatedPlayerCards = [...playerCards];
+    let updatedDealerCards = [];
+    let updatedPlayerCards = [];
     let cardsToPile = [...pile];
 
     for (let i = 0; i < 4; i = i + 2) {
-      console.log('dealer', i, deckIndex, playingDeck[deckIndex + i]);
       updatedDealerCards.push(playingDeck[deckIndex + i]);
       cardsToPile.push(playingDeck[deckIndex + i]);
-      console.log('player', i + 1, deckIndex, playingDeck[deckIndex + i + 1]);
       updatedPlayerCards.push(playingDeck[deckIndex + i + 1]);
       cardsToPile.push(playingDeck[deckIndex + i + 1]);
     }
@@ -38,6 +44,12 @@ export default function Home() {
     setPlayerCards(updatedPlayerCards);
     setPile(cardsToPile);
     setDeckIndex(deckIndex + 4);
+
+    setHitButton(false);
+
+    if (updatedPlayerCards.length >= 2 && updatedPlayerCards[0].value === updatedPlayerCards[1].value) {
+      console.log(`same values ${updatedPlayerCards[0].value} // ${updatedPlayerCards[1].value}`);
+    }
   }
 
   function split() {
@@ -51,6 +63,7 @@ export default function Home() {
     setPlayerCards([...playerCards, playingDeck[deckIndex]]);
     setPile([...pile, playingDeck[deckIndex]]);
     setDeckIndex((prevIndex) => prevIndex + 1);
+    console.log(playerCards.reduce((n, { value }) => n + value, 0));
   }
   function stand() {
     console.log('stand');
@@ -60,12 +73,30 @@ export default function Home() {
   }
 
   const actions = {
-    deal,
-    split,
-    double,
-    hit,
-    stand,
-    surrender,
+    deal: {
+      func: deal,
+      disabled: dealButton,
+    },
+    split: {
+      func: split,
+      disabled: splitButton,
+    },
+    double: {
+      func: double,
+      disabled: doubleButton,
+    },
+    hit: {
+      func: hit,
+      disabled: hitButton,
+    },
+    stand: {
+      func: stand,
+      disabled: standButton,
+    },
+    surrender: {
+      func: surrender,
+      disabled: surrenderButton,
+    },
   };
 
   const mitCount = pile.reduce((n, { mitCountValue }) => n + mitCountValue, 0);

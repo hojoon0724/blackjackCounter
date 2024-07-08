@@ -13,7 +13,7 @@ export default function DealerCardsContainer({ playerCards }) {
             key={card.name}
             src={card.cardSvg}
             alt={card.name}
-            style={{ transform: `translateX(${3.5 * index}svh) translateY(${-3.5 * index}svh)` }}
+            style={{ transform: `translateX(${25 * index}%) translateY(${-17.85 * index}%)` }}
           />
         );
       })}

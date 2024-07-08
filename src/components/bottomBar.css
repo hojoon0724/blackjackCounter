@@ -2,6 +2,11 @@
   border: 1px solid red;
 } */
 
+:root {
+  --transparent: 1;
+  --highlight: rgba(255, 255, 255, 0);
+}
+
 .bottom-bar {
   width: 100%;
   min-height: 16px;
@@ -26,10 +31,10 @@
 .mit-count-container > .mit-count-value {
   min-width: 3ch;
   text-align: right;
-  color: rgba(255, 255, 255, 0);
+  color: rgba(255, 255, 255, var(--transparent));
   transition: 0.3s ease-in-out;
   margin-left: 1ch;
-  background-color: rgba(255, 255, 255, 0.7);
+  background-color: var(--highlight);
 }
 
 .mit-count-container:hover > .mit-count-value {
