@@ -38,9 +38,6 @@
   border-radius: 0.8svh;
 }
 
-.player-cards-container > .card:nth-child(2) {
-  transform: translateX(3.5svh) translateY(-3.5svh);
-}
 .player-chip-area {
   min-height: 5svh;
   min-width: 5svh;

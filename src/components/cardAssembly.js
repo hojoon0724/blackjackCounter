@@ -30,7 +30,7 @@ export default function cardDeckAssembly(deckAmount) {
           }
 
           cardObject = {
-            name: `${suit}-${num}`,
+            name: `${suit}-${num}-${deckNumber}`,
             value: cardValue,
             mitCountValue: mitValue,
             cardSvg: `./SVGs/${suit}-${num}.svg`,
