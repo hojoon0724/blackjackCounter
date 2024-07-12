@@ -23,6 +23,7 @@
 .card-box {
   display: flex;
 }
+
 .card-box img {
   width: 50%;
 }

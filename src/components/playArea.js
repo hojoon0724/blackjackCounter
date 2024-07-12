@@ -11,6 +11,7 @@ export default function PlayArea({ dealerCards, playerCards }) {
       <div className="player-container">
         <PlayerCardsContainer playerCards={playerCards} />
         <div className="player-bet-container flex-row justify-center align-center">
+          <div className="player-card-value">{playerCards.reduce((n, { value }) => n + value, 0)}</div>
           <div className="player-chip-area"></div>
           <div className="player-bet-value">$100</div>
         </div>
