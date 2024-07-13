@@ -3,6 +3,10 @@
   --card-height: calc(var(--card-width) * (3.5 / 2.5));
 }
 
+div {
+  box-sizing: border-box;
+}
+
 .top {
   background-color: #0b280b;
   height: 100svh;
@@ -73,13 +77,4 @@
 .front,
 .back {
   backface-visibility: hidden;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
 }

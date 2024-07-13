@@ -1,69 +1,29 @@
-import { motion } from 'framer-motion';
 import './bottomBar.css';
+import DeckAmountInput from './deckAmountInput';
+import GameActionButtons from './gameActionButtons';
 
-export default function BottomBar({ mitCount, actions }) {
+export default function BottomBar({ deckAmount, setDeckAmount, actions, gameInProgress }) {
   return (
-    <div className="bottom-bar flex-row space-between">
-      <div className="mit-count-container flex-row">
-        <div className="mit-count-label">Count: </div>
-        <div className="mit-count-value">{mitCount}</div>
+    <div className="bottom-bar flex-row">
+      <div className="empty">&nbsp;</div>
+      {/* <div className="shuffle-container">
+        <DeckAmountInput deckAmount={deckAmount} setDeckAmount={setDeckAmount} actions={actions} />
+      </div> */}
+
+      <GameActionButtons actions={actions} gameInProgress={gameInProgress} />
+
+      <div className="shuffle-container">
+        <DeckAmountInput deckAmount={deckAmount} setDeckAmount={setDeckAmount} actions={actions} />
       </div>
-      <div className="actions-container flex-row">
-        <motion.button
-          whileTap={{ scale: 0.9 }}
-          whileHover={{ scale: 1.2 }}
-          disabled={actions.split.disabled}
-          className="action-button action-split"
-          onClick={actions.split.func}
-        >
-          Split
-        </motion.button>
-        <motion.button
-          whileTap={{ scale: 0.9 }}
-          whileHover={{ scale: 1.2 }}
-          disabled={actions.double.disabled}
-          className="action-button action-double"
-          onClick={actions.double.func}
-        >
-          Double
-        </motion.button>
-        <motion.button
-          whileTap={{ scale: 0.9 }}
-          whileHover={{ scale: 1.2 }}
-          disabled={actions.hit.disabled}
-          className="action-button action-hit"
-          onClick={actions.hit.func}
-        >
-          Hit
-        </motion.button>
-        <motion.button
-          whileTap={{ scale: 0.9 }}
-          whileHover={{ scale: 1.2 }}
-          disabled={actions.stand.disabled}
-          className="action-button action-stand"
-          onClick={actions.stand.func}
-        >
-          Stand
-        </motion.button>
-        <motion.button
-          whileTap={{ scale: 0.9 }}
-          whileHover={{ scale: 1.2 }}
-          disabled={actions.surrender.disabled}
-          className="action-button action-surrender"
-          onClick={actions.surrender.func}
-        >
-          Surrender
-        </motion.button>
-        <motion.button
+      {/* <motion.button
           whileTap={{ scale: 0.9 }}
           whileHover={{ scale: 1.2 }}
           className="action-button"
           onClick={actions.printArray.func}
         >
           Print Pile
-        </motion.button>
-      </div>
-      <div className="deal-button-container flex-row">
+        </motion.button> */}
+      {/* <div className="deal-button-container flex-row">
         <motion.button
           whileTap={{ scale: 0.9 }}
           whileHover={{ scale: 1.2 }}
@@ -73,7 +33,7 @@ export default function BottomBar({ mitCount, actions }) {
         >
           Deal
         </motion.button>
-      </div>
+      </div> */}
     </div>
   );
 }

@@ -13,6 +13,8 @@
   background-color: rgba(0, 0, 0, 0.4);
   padding: 10px;
   box-sizing: border-box;
+  position: relative;
+  justify-content: space-between;
 }
 
 .mit-count-container,
@@ -22,10 +24,6 @@
 
 .money-value {
   margin-left: 1ch;
-}
-
-.mit-count-container {
-  justify-content: flex-start;
 }
 
 .mit-count-container > .mit-count-value {
@@ -43,6 +41,21 @@
   opacity: 1;
 }
 
+.shuffle-container {
+  display: flex;
+}
+
+.actions-container {
+  box-sizing: border-box;
+  align-self: center;
+  justify-self: center;
+  justify-content: center;
+  position: absolute;
+  margin: 0 auto;
+  width: calc(100% - 20px);
+  transition: 0.5 ease-in-out;
+}
+
 .action-button,
 .deal-button {
   min-width: 11ch;
@@ -55,7 +68,7 @@
 }
 
 .deal-button-container {
-  justify-content: flex-end;
+  /* justify-content: flex-end; */
 }
 
 .action-split {

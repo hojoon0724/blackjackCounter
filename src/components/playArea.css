@@ -39,6 +39,7 @@
 }
 
 .player-chip-area {
+  box-sizing: content-box;
   min-height: calc(var(--card-width) / 3);
   min-width: calc(var(--card-width) / 3);
   border-radius: 100%;

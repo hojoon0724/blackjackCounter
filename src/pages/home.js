@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import TopBar from '../components/topBar';
 import BottomBar from '../components/bottomBar';
 import PlayArea from '../components/playArea';
@@ -25,21 +25,27 @@ export default function Home() {
   const [surrenderButton, disableSurrenderButton] = useState(true);
 
   const [hiddenCard, setHiddenCard] = useState(true);
+  const [gameInProgress, setGameInProgress] = useState(false);
 
+  const hasInitialized = useRef(false);
   const mitCount = sumMitCount(pile);
 
   useEffect(() => {
-    initializeDeck();
-  });
+    if (!hasInitialized.current) {
+      function initializeDeck() {
+        let cardDeck = cardDeckAssembly(deckAmount);
+        let shuffledDeck = shuffleDeck(cardDeck);
+        setPlayingDeck(shuffledDeck);
+      }
 
-  function initializeDeck() {
-    let cardDeck = cardDeckAssembly(deckAmount);
-    let shuffledDeck = shuffleDeck(cardDeck);
-    setPlayingDeck(shuffledDeck);
-  }
+      initializeDeck();
+      hasInitialized.current = true;
+    }
+  }, [deckAmount]);
 
   // Game Logic Functions
   function deal() {
+    setGameInProgress(true);
     setHiddenCard(true);
     disableDealButton(true);
     let updatedDealerCards = [];
@@ -99,16 +105,26 @@ export default function Home() {
   }
 
   function stand() {
+    disableAllButtons();
     setTimeout(() => {
       setHiddenCard(false);
     }, 500);
     setTimeout(() => {
-      checkOutcome();
+      dealerPlay();
     }, 1500);
   }
 
   function surrender() {
     console.log('surrender');
+  }
+
+  function disableAllButtons() {
+    disableDoubleButton(true);
+    disableHitButton(true);
+    disableSplitButton(true);
+    disableSurrenderButton(true);
+    disableStandButton(true);
+    disableDealButton(true);
   }
 
   function resetButtons() {
@@ -121,16 +137,19 @@ export default function Home() {
   }
 
   function win() {
+    setGameInProgress(false);
     resetButtons();
     console.log('win');
   }
 
   function lose() {
+    setGameInProgress(false);
     resetButtons();
     console.log('lose');
   }
 
   function push() {
+    setGameInProgress(false);
     resetButtons();
     console.log('push');
   }
@@ -148,14 +167,46 @@ export default function Home() {
     }
   }
 
-  function checkOutcome() {
-    if (sumValues(playerCards) === sumValues(dealerCards)) {
+  function checkOutcome(dealerBust) {
+    console.log(`checking outcome`);
+
+    if (dealerBust === true) {
+      console.log(`result: player: ${sumValues(playerCards)} // ${sumValues(dealerCards)}`);
+      win();
+    } else if (sumValues(playerCards) === sumValues(dealerCards)) {
+      console.log(`result: player: ${sumValues(playerCards)} // ${sumValues(dealerCards)}`);
       push();
     } else if (sumValues(playerCards) < sumValues(dealerCards)) {
+      console.log(`result: player: ${sumValues(playerCards)} // ${sumValues(dealerCards)}`);
       lose();
     } else if (sumValues(playerCards) > sumValues(dealerCards)) {
+      console.log(`result: player: ${sumValues(playerCards)} // ${sumValues(dealerCards)}`);
       win();
     }
+  }
+
+  function dealerPlay() {
+    let updatedDealerCards = dealerCards;
+    let newCardIndex = deckIndex;
+    let dealerBust = false;
+    function drawCard() {
+      if (sumValues(updatedDealerCards) < 17) {
+        console.log(sumValues(updatedDealerCards));
+        updatedDealerCards.push(playingDeck[newCardIndex]);
+        setDealerCards([...updatedDealerCards]);
+        setPile(prevPile => [...prevPile, playingDeck[newCardIndex]]);
+        newCardIndex = newCardIndex + 1;
+        setDeckIndex(prevIndex => prevIndex + 1);
+
+        setTimeout(drawCard, 1000);
+      } else {
+        if (sumValues(updatedDealerCards) > 21) {
+          dealerBust = true;
+        }
+        checkOutcome(dealerBust);
+      }
+    }
+    drawCard();
   }
 
   const actions = {
@@ -206,9 +257,15 @@ export default function Home() {
 
   return (
     <div className="top flex-column">
-      <TopBar deckAmount={deckAmount} setDeckAmount={setDeckAmount} actions={actions} />
+      <TopBar mitCount={mitCount} actions={actions} />
       <PlayArea dealerCards={dealerCards} playerCards={playerCards} hiddenCard={hiddenCard} />
-      <BottomBar mitCount={mitCount} actions={actions} />
+      <BottomBar
+        deckAmount={deckAmount}
+        setDeckAmount={setDeckAmount}
+        mitCount={mitCount}
+        actions={actions}
+        gameInProgress={gameInProgress}
+      />
     </div>
   );
 }

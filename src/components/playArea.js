@@ -8,9 +8,15 @@ import './playArea.css';
 export default function PlayArea({ dealerCards, playerCards, hiddenCard }) {
   return (
     <div className="play-area flex-column align-center">
-      <div className="dealer-container flex-row justify-center">
-        <DealerCardsContainer dealerCards={dealerCards} hiddenCard={hiddenCard} />
+      <div className="dealer-container">
+        <div className="dealer-container flex-row justify-center">
+          <DealerCardsContainer dealerCards={dealerCards} hiddenCard={hiddenCard} />
+        </div>
+        <div className="dealer-number-container flex-row justify-center align-center">
+          <div className="dealer-card-value">{hiddenCard ? '' : sumValues(dealerCards)}</div>
+        </div>
       </div>
+
       <div className="player-container">
         <PlayerCardsContainer playerCards={playerCards} />
         <div className="player-bet-container flex-row justify-center align-center">
