@@ -1,5 +1,4 @@
 import './topBar.css';
-import DeckAmountInput from '../components/deckAmountInput';
 
 export default function TopBar({ mitCount }) {
   return (
