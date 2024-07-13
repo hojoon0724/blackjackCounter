@@ -1,17 +1,57 @@
-export default function DealerCardsContainer({ dealerCards }) {
-  // let dealerCards = [
-  //   { name: '04-13K-3', value: 10, mitCountValue: -1, cardSvg: './SVGs/04-13K.svg', deckNum: '3' },
-  //   { name: '02-10-6', value: 10, mitCountValue: -1, cardSvg: './SVGs/02-10.svg', deckNum: '6' },
-  // ];
+import { motion } from 'framer-motion';
 
-  return (
-    <div className="dealer-cards-container">
-      {dealerCards.map((card) => {
-        return <img className="card" key={card.name} src={card.cardSvg} alt={card.name} />;
-      })}
-      {/* <div className="cards-stats-test" style={{ padding: '20px' }}>
-        <p>{dealerCards.reduce((n, { value }) => n + value, 0)}</p>
-      </div> */}
-    </div>
-  );
+export default function DealerCardsContainer({ dealerCards, hiddenCard }) {
+  if (dealerCards.length > 0) {
+    return (
+      <div className="dealer-cards-container">
+        <motion.div
+          className="card"
+          transition={{ duration: hiddenCard ? 0 : 0.7 }}
+          initial={{ rotateY: 180, perspective: 1000 }}
+          animate={{ rotateY: hiddenCard ? 180 : 0, perspective: 1000 }}
+        >
+          <motion.div
+            className="card-container"
+            transition={{ duration: 0.7 }}
+            // animate={{ rotateY: hiddenCard ? 0 : 180 }}
+          >
+            <motion.img
+              className="front"
+              transition={{ duration: 0.7 }}
+              initial={{ rotateY: 0 }}
+              animate={{ rotateY: hiddenCard ? 180 : 0 }}
+              src={dealerCards[0].cardSvg}
+              alt={dealerCards[0].name}
+              style={{ position: 'absolute' }}
+            ></motion.img>
+
+            <motion.img
+              className="back"
+              transition={{ duration: hiddenCard ? 0 : 0.7 }}
+              initial={{ rotateY: 180, opacity: 1 }}
+              animate={{ rotateY: hiddenCard ? 0 : 180 }}
+              src="./SVGs/00-back.svg"
+              alt={'card back side'}
+            ></motion.img>
+          </motion.div>
+        </motion.div>
+
+        {dealerCards.slice(1).map((card, index) => {
+          return (
+            <motion.img
+              className="card"
+              transition={{ duration: 0.5, delay: index < 1 ? index * 0.5 + 0.7 : 0 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              key={card.name}
+              src={card.cardSvg}
+              alt={card.name}
+            />
+          );
+        })}
+      </div>
+    );
+  } else {
+  }
 }

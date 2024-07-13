@@ -1,15 +1,16 @@
-export default function DealerCardsContainer({ playerCards }) {
-  // let playerCards = [
-  //   { name: '01-12Q-3', value: 10, mitCountValue: -1, cardSvg: './SVGs/01-12Q.svg', deckNum: '3' },
-  //   { name: '01-01-6', value: 11, mitCountValue: -1, cardSvg: './SVGs/01-01.svg', deckNum: '6' },
-  // ];
+import { motion } from 'framer-motion';
 
+export default function DealerCardsContainer({ playerCards }) {
   return (
     <div className="player-cards-container">
       {playerCards.map((card, index) => {
         return (
-          <img
+          <motion.img
             className="card"
+            transition={{ duration: 0.5, delay: index < 2 ? index * 0.5 + 0.2 : 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             key={card.name}
             src={card.cardSvg}
             alt={card.name}
@@ -17,9 +18,45 @@ export default function DealerCardsContainer({ playerCards }) {
           />
         );
       })}
-      {/* <div className="cards-stats-test" style={{ padding: '20px' }}>
-        <p>{playerCards.reduce((n, { value }) => n + value, 0)}</p>
-      </div> */}
     </div>
   );
 }
+
+// return (
+// <motion.div
+//   key={index}
+//   className="card"
+//   transition={{ duration: 0.7 }}
+//   initial={{ rotateY: 180, x: translateXPercent, y: translateYPercent, perspective: 1000 }}
+//   animate={{ rotateY: 0, x: translateXPercent, y: translateYPercent, perspective: 1000 }}
+// >
+//   <motion.div
+//     className="card-container"
+//     transition={{ duration: 0.7 }}
+//     initial={{ rotateY: 180 }}
+//     animate={{ rotateY: 0 }}
+//   >
+//     <motion.img
+//       className="front"
+//       transition={{ duration: 0.7 }}
+//       initial={{ rotateY: 180, opacity: 1 }}
+//       animate={{ rotateY: 0, opacity: 1 }}
+//       src={card.cardSvg}
+//       alt={card.name}
+//     >
+//       {/* <img className="card-front" src={card.cardSvg} alt={card.name} /> */}
+//     </motion.img>
+
+//     <motion.img
+//       className="back"
+//       transition={{ duration: 0.7 }}
+//       initial={{ rotateY: 0, opacity: 1 }}
+//       animate={{ rotateY: 180, opacity: 1 }}
+//       src="./SVGs/00-back.svg"
+//       alt={'card back side'}
+//     >
+//       {/* <img className="card-back" src="./SVGs/00-back.svg" alt={'card back side'} /> */}
+//     </motion.img>
+//   </motion.div>
+// </motion.div>
+// );

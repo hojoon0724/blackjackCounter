@@ -1,16 +1,19 @@
 import { useState, useEffect } from 'react';
-import cardDeckAssembly from '../components/cardAssembly';
-import shuffleDeck from '../components/shuffleDeck';
 import TopBar from '../components/topBar';
 import BottomBar from '../components/bottomBar';
 import PlayArea from '../components/playArea';
+
+import { printArray } from '../components/gameLogic/otherActions';
+import { cardDeckAssembly, shuffleDeck, sumValues, sumMitCount } from '../components/gameLogic/calculations';
 
 export default function Home() {
   const [deckAmount, setDeckAmount] = useState(6);
   const [playingDeck, setPlayingDeck] = useState([]);
 
   const [deckIndex, setDeckIndex] = useState(0);
+
   const [dealerCards, setDealerCards] = useState([]);
+
   const [playerCards, setPlayerCards] = useState([]);
   const [pile, setPile] = useState([]);
 
@@ -21,28 +24,37 @@ export default function Home() {
   const [standButton, disableStandButton] = useState(true);
   const [surrenderButton, disableSurrenderButton] = useState(true);
 
+  const [hiddenCard, setHiddenCard] = useState(true);
+
+  const mitCount = sumMitCount(pile);
+
   useEffect(() => {
+    initializeDeck();
+  }, []);
+
+  function initializeDeck() {
     let cardDeck = cardDeckAssembly(deckAmount);
     let shuffledDeck = shuffleDeck(cardDeck);
     setPlayingDeck(shuffledDeck);
-  }, [deckAmount]);
+  }
 
   // Game Logic Functions
   function deal() {
+    setHiddenCard(true);
     disableDealButton(true);
     let updatedDealerCards = [];
     let updatedPlayerCards = [];
     let cardsToPile = [...pile];
 
     for (let i = 0; i < 4; i = i + 2) {
-      updatedDealerCards.push(playingDeck[deckIndex + i]);
+      updatedPlayerCards.push(playingDeck[deckIndex + i]);
       cardsToPile.push(playingDeck[deckIndex + i]);
-      updatedPlayerCards.push(playingDeck[deckIndex + i + 1]);
+      updatedDealerCards.push(playingDeck[deckIndex + i + 1]);
       cardsToPile.push(playingDeck[deckIndex + i + 1]);
     }
 
-    setDealerCards(updatedDealerCards);
     setPlayerCards(updatedPlayerCards);
+    setDealerCards(updatedDealerCards);
     setPile(cardsToPile);
     setDeckIndex(deckIndex + 4);
 
@@ -50,13 +62,8 @@ export default function Home() {
     disableHitButton(false);
     disableStandButton(false);
 
-    if (
-      updatedPlayerCards.length >= 2 &&
-      updatedPlayerCards[0].value === updatedPlayerCards[1].value
-    ) {
-      console.log(
-        `same values ${updatedPlayerCards[0].value} // ${updatedPlayerCards[1].value}`,
-      );
+    if (updatedPlayerCards.length >= 2 && updatedPlayerCards[0].value === updatedPlayerCards[1].value) {
+      console.log(`same values ${updatedPlayerCards[0].value} // ${updatedPlayerCards[1].value}`);
       disableSplitButton(false);
     }
   }
@@ -71,10 +78,6 @@ export default function Home() {
     setPile([...pile, playingDeck[deckIndex]]);
     setDeckIndex(prevIndex => prevIndex + 1);
     return cardsDealt;
-  }
-
-  function sumValues(cardArray) {
-    return cardArray.reduce((n, { value }) => n + value, 0);
   }
 
   function split() {
@@ -96,7 +99,12 @@ export default function Home() {
   }
 
   function stand() {
-    checkOutcome();
+    setTimeout(() => {
+      setHiddenCard(false);
+    }, 500);
+    setTimeout(() => {
+      checkOutcome();
+    }, 1500);
   }
 
   function surrender() {
@@ -130,14 +138,17 @@ export default function Home() {
   function checkBust(cardsDealt) {
     if (sumValues(cardsDealt) === 21) {
       stand();
-    } else if (cardsDealt.reduce((n, { value }) => n + value, 0) > 21) {
-      lose();
+    } else if (sumValues(cardsDealt) > 21) {
+      setTimeout(() => {
+        setHiddenCard(false);
+      }, 500);
+      setTimeout(() => {
+        lose();
+      }, 1000);
     }
   }
 
   function checkOutcome() {
-    console.log(playerCards);
-    console.log(dealerCards);
     if (sumValues(playerCards) === sumValues(dealerCards)) {
       push();
     } else if (sumValues(playerCards) < sumValues(dealerCards)) {
@@ -145,10 +156,6 @@ export default function Home() {
     } else if (sumValues(playerCards) > sumValues(dealerCards)) {
       win();
     }
-  }
-
-  function printPile() {
-    console.log(pile);
   }
 
   const actions = {
@@ -176,22 +183,31 @@ export default function Home() {
       func: surrender,
       disabled: surrenderButton,
     },
-    printPile: {
-      func: printPile,
+    printArray: {
+      func: () => printArray(pile),
+      disabled: false,
+    },
+    resetDeck: {
+      func: () => {
+        setPlayingDeck([]);
+        setDealerCards([]);
+        setPlayerCards([]);
+        setPile([]);
+        setDeckIndex(0);
+        resetButtons();
+
+        let cardDeck = cardDeckAssembly(deckAmount);
+        let shuffledDeck = shuffleDeck(cardDeck);
+        setPlayingDeck(shuffledDeck);
+      },
       disabled: false,
     },
   };
 
-  const mitCount = pile.reduce((n, { mitCountValue }) => n + mitCountValue, 0);
-
   return (
     <div className="top flex-column">
-      <TopBar
-        deckAmount={deckAmount}
-        setDeckAmount={setDeckAmount}
-        actions={actions}
-      />
-      <PlayArea dealerCards={dealerCards} playerCards={playerCards} />
+      <TopBar deckAmount={deckAmount} setDeckAmount={setDeckAmount} actions={actions} />
+      <PlayArea dealerCards={dealerCards} playerCards={playerCards} hiddenCard={hiddenCard} />
       <BottomBar mitCount={mitCount} actions={actions} />
     </div>
   );
