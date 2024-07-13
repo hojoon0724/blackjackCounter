@@ -30,7 +30,7 @@ export default function Home() {
 
   useEffect(() => {
     initializeDeck();
-  }, []);
+  });
 
   function initializeDeck() {
     let cardDeck = cardDeckAssembly(deckAmount);
