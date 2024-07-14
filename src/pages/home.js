@@ -4,7 +4,13 @@ import BottomBar from '../components/bottomBar';
 import PlayArea from '../components/playArea';
 
 import { printArray } from '../components/gameLogic/otherActions';
-import { cardDeckAssembly, shuffleDeck, sumValues, sumMitCount } from '../components/gameLogic/calculations';
+import {
+  cardDeckAssembly,
+  shuffleDeck,
+  sumValues,
+  sumMitCount,
+  sumWithAce,
+} from '../components/gameLogic/calculations';
 
 export default function Home() {
   const [deckAmount, setDeckAmount] = useState(6);
@@ -13,7 +19,6 @@ export default function Home() {
   const [deckIndex, setDeckIndex] = useState(0);
 
   const [dealerCards, setDealerCards] = useState([]);
-
   const [playerCards, setPlayerCards] = useState([]);
   const [pile, setPile] = useState([]);
 
@@ -255,10 +260,36 @@ export default function Home() {
     },
   };
 
+  const devActions = {
+    flipHidden: () => {
+      if (hiddenCard) {
+        setHiddenCard(false);
+      } else {
+        setHiddenCard(true);
+      }
+    },
+    addToDealer: () => {
+      setDealerCards([...dealerCards, playingDeck[deckIndex]]);
+    },
+    printDealer: () => console.log(dealerCards),
+    printPlayer: () => console.log(playerCards),
+    printDeck: () => console.log(playingDeck),
+    printDeckCount: () => console.log(playingDeck.length),
+    printPile: () => console.log(pile),
+    printPileCount: () => console.log(pile.length),
+    printAce: () => sumWithAce(playerCards),
+  };
+
   return (
     <div className="top flex-column">
       <TopBar mitCount={mitCount} actions={actions} />
-      <PlayArea dealerCards={dealerCards} playerCards={playerCards} hiddenCard={hiddenCard} />
+      <PlayArea
+        dealerCards={dealerCards}
+        playerCards={playerCards}
+        hiddenCard={hiddenCard}
+        devActions={devActions}
+        gameInProgress={gameInProgress}
+      />
       <BottomBar
         deckAmount={deckAmount}
         setDeckAmount={setDeckAmount}
@@ -269,20 +300,3 @@ export default function Home() {
     </div>
   );
 }
-
-// let pile = [
-//   { name: '04-13K-3', value: 10, mitCountValue: -1, cardSvg: './SVGs/04-13K.svg', deckNum: '3' },
-//   { name: '02-10-6', value: 10, mitCountValue: -1, cardSvg: './SVGs/02-10.svg', deckNum: '6' },
-//   { name: '01-12Q-3', value: 10, mitCountValue: -1, cardSvg: './SVGs/01-12Q.svg', deckNum: '3' },
-//   { name: '01-01-6', value: 11, mitCountValue: -1, cardSvg: './SVGs/01-01.svg', deckNum: '6' },
-// ];
-
-// let dealerCards = [
-//   { name: '04-13K-3', value: 10, mitCountValue: -1, cardSvg: './SVGs/04-13K.svg', deckNum: '3' },
-//   { name: '02-10-6', value: 10, mitCountValue: -1, cardSvg: './SVGs/02-10.svg', deckNum: '6' },
-// ];
-
-// let playerCards = [
-//   { name: '01-12Q-3', value: 10, mitCountValue: -1, cardSvg: './SVGs/01-12Q.svg', deckNum: '3' },
-//   { name: '01-01-6', value: 11, mitCountValue: -1, cardSvg: './SVGs/01-01.svg', deckNum: '6' },
-// ];

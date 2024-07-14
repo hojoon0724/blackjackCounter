@@ -50,6 +50,22 @@ export function sumValues(cardArray) {
   return cardArray.reduce((n, { value }) => n + value, 0);
 }
 
+export function sumWithAce(cardArray) {
+  const aceExists = cardArray.some(card => card.value === 1);
+  const rawVal = cardArray.reduce((n, { value }) => n + value, 0);
+  console.log(cardArray.length, rawVal);
+  if (cardArray.length === 2 && rawVal === 11) {
+    return 21;
+  }
+  if (aceExists && rawVal + 10 < 22) {
+    console.log(`${rawVal + 10}/${rawVal}`);
+    return `${rawVal + 10}/${rawVal}`;
+  } else {
+    console.log(rawVal);
+    return rawVal;
+  }
+}
+
 export function sumMitCount(cardArray) {
   return cardArray.reduce((n, { mitCountValue }) => n + mitCountValue, 0);
 }

@@ -81,3 +81,7 @@
 }
 .action-surrender {
 }
+
+.shuffle-container {
+  z-index: 1;
+}

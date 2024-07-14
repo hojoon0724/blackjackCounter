@@ -8,21 +8,64 @@
 }
 
 .dealer-container {
-  width: 100%;
+  transition: 0.5s ease-in-out;
+  box-sizing: content-box;
 }
 
 .dealer-cards-container {
-  width: 100%;
   padding: 6px;
   border-radius: 8px;
   display: flex;
   flex-direction: row-reverse;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
+  box-sizing: content-box;
+}
+
+.card-container,
+.face-down-card {
+  box-sizing: content-box;
+  /* width: calc(var(--card-width) + 1.5svh); */
+  height: var(--card-height);
+  display: flex;
+  /* margin-right: 0.75svh; */
+}
+
+.card-container {
+  margin: 0 0.75svh;
+  width: fit-content;
 }
 
 .dealer-cards-container > .card {
-  margin: 0 0.75svh;
+  /* box-sizing: content-box;
+  width: var(--card-width);
+  height: var(--card-height);
+  margin: 0 0.75svh; */
+}
+
+.card-container {
+  box-shadow: 1px 1px 4px black;
+  border-radius: 3%;
+  /* background-color: red; */
+}
+
+.card {
+  width: var(--card-width);
+
+  /* position: absolute; */
+}
+
+.cardback {
+  width: var(--card-width);
+  /* position: absolute; */
+}
+
+.front,
+.back {
+  backface-visibility: hidden;
+  box-sizing: border-box;
+  width: var(--card-width);
+  height: var(--card-height);
 }
 
 .player-cards-container {

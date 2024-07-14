@@ -57,24 +57,3 @@ div {
 .justify-center {
   justify-content: center;
 }
-
-.card-container {
-  backface-visibility: hidden;
-  height: var(--card-height);
-  /* position: relative; */
-}
-
-.card {
-  width: var(--card-width);
-  /* position: absolute; */
-}
-
-.cardback {
-  width: var(--card-width);
-  /* position: absolute; */
-}
-
-.front,
-.back {
-  backface-visibility: hidden;
-}
