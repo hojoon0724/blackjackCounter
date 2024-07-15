@@ -19,7 +19,7 @@ export default function Home() {
   const [deckIndex, setDeckIndex] = useState(0);
 
   const [dealerCards, setDealerCards] = useState([]);
-  const [playerCards, setPlayerCards] = useState([]);
+  const [playerCards, setPlayerCards] = useState([[]]);
   const [pile, setPile] = useState([]);
 
   const [dealButton, disableDealButton] = useState(false);
@@ -64,19 +64,21 @@ export default function Home() {
       cardsToPile.push(playingDeck[deckIndex + i + 1]);
     }
 
-    setPlayerCards(updatedPlayerCards);
+    setPlayerCards([updatedPlayerCards]);
     setDealerCards(updatedDealerCards);
     setPile(cardsToPile);
     setDeckIndex(deckIndex + 4);
 
+    disableSplitButton(false);
     disableDoubleButton(false);
     disableHitButton(false);
     disableStandButton(false);
+    disableSurrenderButton(false);
 
-    if (updatedPlayerCards.length >= 2 && updatedPlayerCards[0].value === updatedPlayerCards[1].value) {
-      console.log(`same values ${updatedPlayerCards[0].value} // ${updatedPlayerCards[1].value}`);
-      disableSplitButton(false);
-    }
+    // if (updatedPlayerCards.length >= 2 && updatedPlayerCards[0].value === updatedPlayerCards[1].value) {
+    //   console.log(`same values ${updatedPlayerCards[0].value} // ${updatedPlayerCards[1].value}`);
+    //   disableSplitButton(false);
+    // }
   }
 
   function dealCard(target) {
@@ -92,16 +94,21 @@ export default function Home() {
   }
 
   function split() {
+    disableSurrenderButton(true);
+    let updatedPlayerCards = [[playerCards[0][0]], [playerCards[0][1]]];
+    setPlayerCards(updatedPlayerCards);
     console.log('split');
   }
 
   function double() {
+    disableSurrenderButton(true);
     dealCard(playerCards);
     checkBust(dealCard(playerCards));
     stand();
   }
 
   function hit() {
+    disableSurrenderButton(true);
     disableDoubleButton(true);
     disableSplitButton(true);
 
@@ -247,7 +254,7 @@ export default function Home() {
       func: () => {
         setPlayingDeck([]);
         setDealerCards([]);
-        setPlayerCards([]);
+        setPlayerCards([[]]);
         setPile([]);
         setDeckIndex(0);
         resetButtons();
