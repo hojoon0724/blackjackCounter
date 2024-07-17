@@ -30,6 +30,8 @@ export default function Home() {
   const [standButton, disableStandButton] = useState(true);
   const [surrenderButton, disableSurrenderButton] = useState(true);
 
+  const [settingsModalIsOpen, setSettingsModalIsOpen] = useState(false);
+
   const [pile, setPile] = useState([]);
 
   const hasInitialized = useRef(false);
@@ -327,6 +329,7 @@ export default function Home() {
       console.log(`isShuffled = ${isShuffled}`);
       console.log(`gameInProgress = ${gameInProgress}`);
       console.log(`hiddenCard = ${hiddenCard}`);
+      console.log(`settingsModalIsOpen = ${settingsModalIsOpen}`);
     },
     printAce: () => console.log(sumWithAce(playerCards[0])),
     // dealNext: () => dealCard(),
@@ -337,6 +340,7 @@ export default function Home() {
       value={{
         deckAmount,
         setDeckAmount,
+
         playingDeck,
         setPlayingDeck,
         deckIndex,
@@ -347,6 +351,7 @@ export default function Home() {
         setNeedsShuffle,
         isShuffled,
         setIsShuffled,
+
         gameInProgress,
         setGameInProgress,
         dealerCards,
@@ -355,6 +360,7 @@ export default function Home() {
         setHiddenCard,
         playerCards,
         setPlayerCards,
+
         nextUp,
         setNextUp,
         dealButton,
@@ -369,6 +375,10 @@ export default function Home() {
         disableStandButton,
         surrenderButton,
         disableSurrenderButton,
+
+        settingsModalIsOpen,
+        setSettingsModalIsOpen,
+
         pile,
         setPile,
         hasInitialized,
