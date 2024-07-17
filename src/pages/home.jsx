@@ -1,16 +1,12 @@
-import { useState, useEffect, useRef } from 'react';
-import TopBar from '../components/topBar';
-import BottomBar from '../components/bottomBar';
-import PlayArea from '../components/playArea';
+import { useState, useEffect, useRef, createContext } from 'react';
+import TopBar from '../components/ui/topBar';
+import BottomBar from '../components/ui/bottomBar';
+import PlayArea from '../components/playArea/playArea';
 
-import { printArray } from '../components/gameLogic/otherActions';
-import {
-  cardDeckAssembly,
-  shuffleDeck,
-  sumFinalValues,
-  sumMitCount,
-  sumWithAce,
-} from '../components/gameLogic/calculations';
+import { printArray } from '../gameLogic/otherActions';
+import { cardDeckAssembly, shuffleDeck, sumFinalValues, sumMitCount, sumWithAce } from '../gameLogic/calculations';
+
+export const GameContext = createContext();
 
 export default function Home() {
   const [deckAmount, setDeckAmount] = useState(6);
@@ -21,7 +17,9 @@ export default function Home() {
   const [needsShuffle, setNeedsShuffle] = useState(false);
   const [isShuffled, setIsShuffled] = useState(true);
 
+  const [gameInProgress, setGameInProgress] = useState(false);
   const [dealerCards, setDealerCards] = useState([]);
+  const [hiddenCard, setHiddenCard] = useState(true);
   const [playerCards, setPlayerCards] = useState([[]]);
 
   const [nextUp, setNextUp] = useState(0);
@@ -33,8 +31,6 @@ export default function Home() {
   const [surrenderButton, disableSurrenderButton] = useState(true);
 
   const [pile, setPile] = useState([]);
-  const [hiddenCard, setHiddenCard] = useState(true);
-  const [gameInProgress, setGameInProgress] = useState(false);
 
   const hasInitialized = useRef(false);
   const mitCount = sumMitCount(pile);
@@ -74,6 +70,7 @@ export default function Home() {
     // setCutIndex(shuffleDeck.length - 30);
     setIsShuffled(true);
     setNeedsShuffle(false);
+    setGameInProgress(false);
   }
 
   function deal() {
@@ -336,22 +333,56 @@ export default function Home() {
   };
 
   return (
-    <div className="top flex-column">
-      <TopBar mitCount={mitCount} actions={actions} />
-      <PlayArea
-        dealerCards={dealerCards}
-        playerCards={playerCards}
-        hiddenCard={hiddenCard}
-        devActions={devActions}
-        gameInProgress={gameInProgress}
-      />
-      <BottomBar
-        deckAmount={deckAmount}
-        setDeckAmount={setDeckAmount}
-        mitCount={mitCount}
-        actions={actions}
-        gameInProgress={gameInProgress}
-      />
-    </div>
+    <GameContext.Provider
+      value={{
+        deckAmount,
+        setDeckAmount,
+        playingDeck,
+        setPlayingDeck,
+        deckIndex,
+        setDeckIndex,
+        cutIndex,
+        setCutIndex,
+        needsShuffle,
+        setNeedsShuffle,
+        isShuffled,
+        setIsShuffled,
+        gameInProgress,
+        setGameInProgress,
+        dealerCards,
+        setDealerCards,
+        hiddenCard,
+        setHiddenCard,
+        playerCards,
+        setPlayerCards,
+        nextUp,
+        setNextUp,
+        dealButton,
+        disableDealButton,
+        splitButton,
+        disableSplitButton,
+        doubleButton,
+        disableDoubleButton,
+        hitButton,
+        disableHitButton,
+        standButton,
+        disableStandButton,
+        surrenderButton,
+        disableSurrenderButton,
+        pile,
+        setPile,
+        hasInitialized,
+        mitCount,
+
+        actions,
+        devActions,
+      }}
+    >
+      <div className="top flex-column">
+        <TopBar />
+        <PlayArea />
+        <BottomBar />
+      </div>
+    </GameContext.Provider>
   );
 }

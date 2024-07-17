@@ -1,8 +1,9 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { sumWithAce } from './gameLogic/calculations';
-import { useState, useEffect } from 'react';
+import { sumWithAce } from '../../gameLogic/calculations';
+import { useState, useEffect, useContext } from 'react';
+import { GameContext } from '../../pages/home';
 
-export default function PlayerCardsContainer({ playerCards }) {
+export default function PlayerCardsContainer() {
   // console.log('player cards', playerCards);
   // playerCards.map((hand, handIndex) => {
   //   console.log('hand', hand);
@@ -13,6 +14,7 @@ export default function PlayerCardsContainer({ playerCards }) {
   //     console.log(handIndex, cardIndex);
   //   });
   // });
+  const { playerCards } = useContext(GameContext);
 
   const [cardValSum, setCardValSum] = useState([0]);
   const [cardsAreShowing, setCardsAreShowing] = useState(false);

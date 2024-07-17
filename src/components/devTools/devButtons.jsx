@@ -1,4 +1,9 @@
-export default function DevButtons({ devActions }) {
+import { useContext } from 'react';
+import { GameContext } from '../../pages/home';
+
+export default function DevButtons() {
+  const { devActions } = useContext(GameContext);
+
   return (
     <div
       className="dev-buttons-container flex-column"

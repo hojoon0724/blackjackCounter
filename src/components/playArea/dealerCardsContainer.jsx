@@ -1,8 +1,12 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { sumFinalValues } from './gameLogic/calculations';
-import { useState, useEffect } from 'react';
+import { sumFinalValues } from '../../gameLogic/calculations';
+import { useState, useEffect, useContext } from 'react';
+import { GameContext } from '../../pages/home';
 
-export default function DealerCardsContainer({ dealerCards, hiddenCard, gameInProgress }) {
+export default function DealerCardsContainer() {
+  const { dealerCards, setDealerCards, hiddenCard, setHiddenCard, gameInProgress, setGameInProgress } =
+    useContext(GameContext);
+
   const [containerWidth, setContainerWidth] = useState('calc(var(--card-width) + 1.5svh)');
   const [cardValSum, setCardValSum] = useState(0);
 
