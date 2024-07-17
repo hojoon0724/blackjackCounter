@@ -105,7 +105,7 @@ export default function PlayerCardsContainer() {
                           }}
                           initial={{ rotateY: 0, opacity: 1 }}
                           animate={{ rotateY: 180, opacity: 1 }}
-                          src="./SVGs/00-back.svg"
+                          src="./assets/SVGs/00-back.svg"
                           alt={'card back side'}
                         ></motion.img>
                       </motion.div>

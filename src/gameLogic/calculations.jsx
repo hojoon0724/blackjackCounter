@@ -1,3 +1,5 @@
+// import '../../public/assets/SVGs'
+
 export function cardDeckAssembly(deckAmount) {
   const suits = ['01', '02', '03', '04'];
   const cardNums = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11J', '12Q', '13K'];
@@ -25,7 +27,7 @@ export function cardDeckAssembly(deckAmount) {
             name: `${suit}-${num}-${deckNumber}`,
             value: cardValue,
             mitCountValue: mitValue,
-            cardSvg: `/SVGs/${suit}-${num}.svg`,
+            cardSvg: `/assets/SVGs/${suit}-${num}.svg`,
             deckNum: `${deckNumber}`,
           };
 

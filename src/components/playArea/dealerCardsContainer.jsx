@@ -62,7 +62,7 @@ export default function DealerCardsContainer() {
                   initial={{ rotateY: 180, opacity: 0, perspective: 1000 }}
                   animate={{ rotateY: hiddenCard ? 0 : 180, opacity: 1, perspective: 1000 }}
                   exit={{ opacity: 0 }}
-                  src="./SVGs/00-back.svg"
+                  src="./assets/SVGs/00-back.svg"
                   alt={'card back side'}
                 ></motion.img>
               </motion.div>
@@ -99,7 +99,7 @@ export default function DealerCardsContainer() {
                       transition={{ duration: 0.5, delay: 0.3, ease: 'circInOut' }}
                       initial={{ rotateY: 0, opacity: 1 }}
                       animate={{ rotateY: 180, opacity: 1 }}
-                      src="./SVGs/00-back.svg"
+                      src="./assets/SVGs/00-back.svg"
                       alt={'card back side'}
                     ></motion.img>
                   </motion.div>
