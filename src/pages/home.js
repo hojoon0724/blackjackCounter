@@ -7,7 +7,7 @@ import { printArray } from '../components/gameLogic/otherActions';
 import {
   cardDeckAssembly,
   shuffleDeck,
-  sumValues,
+  sumFinalValues,
   sumMitCount,
   sumWithAce,
 } from '../components/gameLogic/calculations';
@@ -17,11 +17,14 @@ export default function Home() {
   const [playingDeck, setPlayingDeck] = useState([]);
 
   const [deckIndex, setDeckIndex] = useState(0);
+  const [cutIndex, setCutIndex] = useState(6);
+  const [needsShuffle, setNeedsShuffle] = useState(false);
+  const [isShuffled, setIsShuffled] = useState(true);
 
   const [dealerCards, setDealerCards] = useState([]);
   const [playerCards, setPlayerCards] = useState([[]]);
-  const [pile, setPile] = useState([]);
 
+  const [nextUp, setNextUp] = useState(0);
   const [dealButton, disableDealButton] = useState(false);
   const [splitButton, disableSplitButton] = useState(true);
   const [doubleButton, disableDoubleButton] = useState(true);
@@ -29,6 +32,7 @@ export default function Home() {
   const [standButton, disableStandButton] = useState(true);
   const [surrenderButton, disableSurrenderButton] = useState(true);
 
+  const [pile, setPile] = useState([]);
   const [hiddenCard, setHiddenCard] = useState(true);
   const [gameInProgress, setGameInProgress] = useState(false);
 
@@ -48,28 +52,54 @@ export default function Home() {
     }
   }, [deckAmount]);
 
+  // useEffect(() => {
+  //   if (needsShuffle && !isShuffled) {
+  //     shuffleDecks();
+  //   }
+  // }, [needsShuffle, isShuffled]);
+
   // Game Logic Functions
+
+  function shuffleDecks() {
+    setPlayingDeck([]);
+    setDealerCards([]);
+    setPlayerCards([[]]);
+    setPile([]);
+    setDeckIndex(0);
+    resetButtons();
+
+    let cardDeck = cardDeckAssembly(deckAmount);
+    let shuffledDeck = shuffleDeck(cardDeck);
+    setPlayingDeck(shuffledDeck);
+    // setCutIndex(shuffleDeck.length - 30);
+    setIsShuffled(true);
+    setNeedsShuffle(false);
+  }
+
   function deal() {
+    if (needsShuffle === true) {
+      setIsShuffled(false);
+    }
+
     setGameInProgress(true);
     setHiddenCard(true);
     disableDealButton(true);
     let updatedDealerCards = [];
-    let updatedPlayerCards = [];
+    let updatedPlayerCards = [[]];
     let cardsToPile = [...pile];
 
     for (let i = 0; i < 4; i = i + 2) {
-      updatedPlayerCards.push(playingDeck[deckIndex + i]);
+      updatedPlayerCards[0].push(playingDeck[deckIndex + i]);
       cardsToPile.push(playingDeck[deckIndex + i]);
       updatedDealerCards.push(playingDeck[deckIndex + i + 1]);
       cardsToPile.push(playingDeck[deckIndex + i + 1]);
     }
 
-    setPlayerCards([updatedPlayerCards]);
+    setPlayerCards(updatedPlayerCards);
     setDealerCards(updatedDealerCards);
     setPile(cardsToPile);
     setDeckIndex(deckIndex + 4);
 
-    disableSplitButton(false);
     disableDoubleButton(false);
     disableHitButton(false);
     disableStandButton(false);
@@ -79,41 +109,56 @@ export default function Home() {
     //   console.log(`same values ${updatedPlayerCards[0].value} // ${updatedPlayerCards[1].value}`);
     //   disableSplitButton(false);
     // }
+    disableSplitButton(false);
   }
 
-  function dealCard(target) {
-    let cardsDealt = [...target, playingDeck[deckIndex]];
+  // function makeDealingOrder() {
+  //   return [setPlayerCards(), setDealerCards()];
+  // }
 
-    // temporarily set to player
-    setPlayerCards(cardsDealt);
-    // temporarily set to player
-
+  function dealCard(targetArray) {
     setPile([...pile, playingDeck[deckIndex]]);
+
+    let updatedHand = [...targetArray, playingDeck[deckIndex]];
     setDeckIndex(prevIndex => prevIndex + 1);
-    return cardsDealt;
+    return updatedHand;
   }
 
   function split() {
     disableSurrenderButton(true);
-    let updatedPlayerCards = [[playerCards[0][0]], [playerCards[0][1]]];
+
+    if (playerCards[0][0].value === 1 && playerCards[0][1].value === 1) {
+      console.log('split aces');
+    }
+
+    let updatedPlayerCards = [];
+    updatedPlayerCards.push([playerCards[0][0]]);
+    updatedPlayerCards.push([playerCards[0][1]]);
+    console.log(updatedPlayerCards);
     setPlayerCards(updatedPlayerCards);
-    console.log('split');
   }
 
   function double() {
     disableSurrenderButton(true);
-    dealCard(playerCards);
-    checkBust(dealCard(playerCards));
+    dealCard(playerCards[0]);
+    checkBust(dealCard(playerCards[0]));
     stand();
   }
 
   function hit() {
+    let handIndex = 0;
     disableSurrenderButton(true);
     disableDoubleButton(true);
     disableSplitButton(true);
 
-    dealCard(playerCards);
-    checkBust(dealCard(playerCards));
+    let currentHand = dealCard(playerCards[0]);
+
+    let updatedPlayerCards = [];
+    updatedPlayerCards.push(dealCard(playerCards[0]));
+    console.log(updatedPlayerCards);
+
+    setPlayerCards(updatedPlayerCards);
+    checkBust(currentHand);
   }
 
   function stand() {
@@ -149,27 +194,30 @@ export default function Home() {
   }
 
   function win() {
+    console.log('win');
     setGameInProgress(false);
     resetButtons();
-    console.log('win');
   }
 
   function lose() {
+    console.log('lose');
     setGameInProgress(false);
     resetButtons();
-    console.log('lose');
   }
 
   function push() {
+    console.log('push');
     setGameInProgress(false);
     resetButtons();
-    console.log('push');
   }
 
   function checkBust(cardsDealt) {
-    if (sumValues(cardsDealt) === 21) {
+    console.log('-----checkBust-----');
+    console.log(cardsDealt);
+    console.log(sumFinalValues(cardsDealt));
+    if (sumFinalValues(cardsDealt) === 21) {
       stand();
-    } else if (sumValues(cardsDealt) > 21) {
+    } else if (sumFinalValues(cardsDealt) > 21) {
       setTimeout(() => {
         setHiddenCard(false);
       }, 500);
@@ -180,19 +228,19 @@ export default function Home() {
   }
 
   function checkOutcome(dealerBust) {
-    console.log(`checking outcome`);
+    checkNeedsShuffle(cutIndex, deckIndex);
 
     if (dealerBust === true) {
-      console.log(`result: player: ${sumValues(playerCards)} // ${sumValues(dealerCards)}`);
+      console.log(`result: player: ${sumFinalValues(playerCards[0])} // ${sumFinalValues(dealerCards)}`);
       win();
-    } else if (sumValues(playerCards) === sumValues(dealerCards)) {
-      console.log(`result: player: ${sumValues(playerCards)} // ${sumValues(dealerCards)}`);
+    } else if (sumFinalValues(playerCards[0]) === sumFinalValues(dealerCards)) {
+      console.log(`result: player: ${sumFinalValues(playerCards[0])} // ${sumFinalValues(dealerCards)}`);
       push();
-    } else if (sumValues(playerCards) < sumValues(dealerCards)) {
-      console.log(`result: player: ${sumValues(playerCards)} // ${sumValues(dealerCards)}`);
+    } else if (sumFinalValues(playerCards[0]) < sumFinalValues(dealerCards)) {
+      console.log(`result: player: ${sumFinalValues(playerCards[0])} // ${sumFinalValues(dealerCards)}`);
       lose();
-    } else if (sumValues(playerCards) > sumValues(dealerCards)) {
-      console.log(`result: player: ${sumValues(playerCards)} // ${sumValues(dealerCards)}`);
+    } else if (sumFinalValues(playerCards[0]) > sumFinalValues(dealerCards)) {
+      console.log(`result: player: ${sumFinalValues(playerCards[0])} // ${sumFinalValues(dealerCards)}`);
       win();
     }
   }
@@ -202,8 +250,7 @@ export default function Home() {
     let newCardIndex = deckIndex;
     let dealerBust = false;
     function drawCard() {
-      if (sumValues(updatedDealerCards) < 17) {
-        console.log(sumValues(updatedDealerCards));
+      if (sumFinalValues(updatedDealerCards) < 17) {
         updatedDealerCards.push(playingDeck[newCardIndex]);
         setDealerCards([...updatedDealerCards]);
         setPile(prevPile => [...prevPile, playingDeck[newCardIndex]]);
@@ -212,7 +259,7 @@ export default function Home() {
 
         setTimeout(drawCard, 1000);
       } else {
-        if (sumValues(updatedDealerCards) > 21) {
+        if (sumFinalValues(updatedDealerCards) > 21) {
           dealerBust = true;
         }
         checkOutcome(dealerBust);
@@ -221,29 +268,35 @@ export default function Home() {
     drawCard();
   }
 
+  function checkNeedsShuffle(cutIndex, currentIndex) {
+    if (cutIndex < currentIndex) {
+      setNeedsShuffle(true);
+    }
+  }
+
   const actions = {
     deal: {
-      func: deal,
+      func: () => deal(),
       disabled: dealButton,
     },
     split: {
-      func: split,
+      func: () => split(),
       disabled: splitButton,
     },
     double: {
-      func: double,
+      func: () => double(),
       disabled: doubleButton,
     },
     hit: {
-      func: hit,
+      func: () => hit(),
       disabled: hitButton,
     },
     stand: {
-      func: stand,
+      func: () => stand(),
       disabled: standButton,
     },
     surrender: {
-      func: surrender,
+      func: () => surrender(),
       disabled: surrenderButton,
     },
     printArray: {
@@ -251,18 +304,7 @@ export default function Home() {
       disabled: false,
     },
     resetDeck: {
-      func: () => {
-        setPlayingDeck([]);
-        setDealerCards([]);
-        setPlayerCards([[]]);
-        setPile([]);
-        setDeckIndex(0);
-        resetButtons();
-
-        let cardDeck = cardDeckAssembly(deckAmount);
-        let shuffledDeck = shuffleDeck(cardDeck);
-        setPlayingDeck(shuffledDeck);
-      },
+      func: () => shuffleDecks(),
       disabled: false,
     },
   };
@@ -283,8 +325,14 @@ export default function Home() {
     printDeck: () => console.log(playingDeck),
     printDeckCount: () => console.log(playingDeck.length),
     printPile: () => console.log(pile),
-    printPileCount: () => console.log(pile.length),
-    printAce: () => sumWithAce(playerCards),
+    printStates: () => {
+      console.log(`needsShuffle = ${needsShuffle}`);
+      console.log(`isShuffled = ${isShuffled}`);
+      console.log(`gameInProgress = ${gameInProgress}`);
+      console.log(`hiddenCard = ${hiddenCard}`);
+    },
+    printAce: () => console.log(sumWithAce(playerCards[0])),
+    // dealNext: () => dealCard(),
   };
 
   return (
