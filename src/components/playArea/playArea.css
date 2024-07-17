@@ -70,8 +70,9 @@
 
 .player-cards-container {
   position: relative;
-  height: var(--card-height);
-  width: var(--card-width);
+  height: calc(var(--card-height) + 0ch);
+  /* width: var(--card-width); */
+  width: fit-content;
   margin: 0 auto;
 }
 
@@ -79,6 +80,14 @@
   position: absolute;
   box-shadow: 1px 1px 4px black;
   border-radius: 3%;
+}
+
+.player-card-value {
+  position: absolute;
+  height: calc(var(--card-height));
+  left: -4ch;
+  display: flex;
+  align-items: center;
 }
 
 .player-chip-area {
@@ -89,4 +98,8 @@
   margin: calc(var(--card-width) / 15);
   padding: calc(var(--card-width) / 8);
   border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.player-cards-container {
+  margin: 0 3svw;
 }

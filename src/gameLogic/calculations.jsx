@@ -25,7 +25,7 @@ export function cardDeckAssembly(deckAmount) {
             name: `${suit}-${num}-${deckNumber}`,
             value: cardValue,
             mitCountValue: mitValue,
-            cardSvg: `./SVGs/${suit}-${num}.svg`,
+            cardSvg: `/SVGs/${suit}-${num}.svg`,
             deckNum: `${deckNumber}`,
           };
 
@@ -46,22 +46,28 @@ export function shuffleDeck(deck) {
   return deck;
 }
 
-export function sumValues(cardArray) {
-  return cardArray.reduce((n, { value }) => n + value, 0);
+export function sumFinalValues(cardArray) {
+  const aceExists = cardArray.some(card => card.value === 1);
+  const rawVal = cardArray.reduce((n, { value }) => n + value, 0);
+  if (cardArray.length === 2 && rawVal === 11 && aceExists) {
+    return 21;
+  }
+  if (aceExists && rawVal + 10 < 22) {
+    return rawVal + 10;
+  } else {
+    return rawVal;
+  }
 }
 
 export function sumWithAce(cardArray) {
   const aceExists = cardArray.some(card => card.value === 1);
   const rawVal = cardArray.reduce((n, { value }) => n + value, 0);
-  console.log(cardArray.length, rawVal);
-  if (cardArray.length === 2 && rawVal === 11) {
+  if (cardArray.length === 2 && rawVal === 11 && aceExists) {
     return 21;
   }
-  if (aceExists && rawVal + 10 < 22) {
-    console.log(`${rawVal + 10}/${rawVal}`);
+  if (aceExists === true && rawVal + 10 < 22) {
     return `${rawVal + 10}/${rawVal}`;
   } else {
-    console.log(rawVal);
     return rawVal;
   }
 }

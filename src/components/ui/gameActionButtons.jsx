@@ -1,6 +1,10 @@
 import { motion } from 'framer-motion';
+import { GameContext } from '../../pages/home';
+import { useContext } from 'react';
 
-export default function GameActionButtons({ actions, gameInProgress }) {
+export default function GameActionButtons() {
+  const { actions, gameInProgress } = useContext(GameContext);
+
   if (gameInProgress) {
     return (
       <motion.div animate={{ opacity: gameInProgress ? 1 : 0 }} className="actions-container flex-row">

@@ -1,4 +1,9 @@
-export default function DevButtons({ devActions }) {
+import { useContext } from 'react';
+import { GameContext } from '../../pages/home';
+
+export default function DevButtons() {
+  const { devActions } = useContext(GameContext);
+
   return (
     <div
       className="dev-buttons-container flex-column"
@@ -33,11 +38,14 @@ export default function DevButtons({ devActions }) {
       <button style={{ fontSize: '1rem', margin: '.5rem' }} onClick={devActions.printPile}>
         printPile
       </button>
-      <button style={{ fontSize: '1rem', margin: '.5rem' }} onClick={devActions.printPileCount}>
-        printPileCount
+      <button style={{ fontSize: '1rem', margin: '.5rem' }} onClick={devActions.printStates}>
+        printStates
       </button>
       <button style={{ fontSize: '1rem', margin: '.5rem' }} onClick={devActions.printAce}>
         ace check
+      </button>
+      <button style={{ fontSize: '1rem', margin: '.5rem' }} onClick={devActions.dealNext}>
+        dealNext
       </button>
       {/* <button onClick={devActions}></button>
       <button onClick={devActions}></button>
