@@ -14,7 +14,7 @@ export default function PlayerCardsContainer() {
   //     console.log(handIndex, cardIndex);
   //   });
   // });
-  const { playerCards } = useContext(GameContext);
+  const { playerCards, handIndex } = useContext(GameContext);
 
   const [cardValSum, setCardValSum] = useState([0]);
   const [cardsAreShowing, setCardsAreShowing] = useState(false);
@@ -27,11 +27,11 @@ export default function PlayerCardsContainer() {
     }
     const timeoutId = setTimeout(() => {
       setCardValSum(allHandsValuesArray, 0);
-    }, 1000);
+    }, 500);
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [playerCards]);
+  }, [playerCards, playerCards[handIndex]]);
 
   useEffect(() => {
     if (playerCards[0].length > 0) {
@@ -45,17 +45,17 @@ export default function PlayerCardsContainer() {
     <div className="player-container">
       <div className="player-hand flex-row ">
         <AnimatePresence>
-          {playerCards.map((hand, handIndex) => {
+          {playerCards.map((hand, index) => {
             return (
-              <div className="player-cards-container " id={handIndex} key={handIndex}>
+              <div className="player-cards-container " id={index} key={index}>
                 <motion.div
                   className="player-card-value"
                   transition={{ duration: 0.5, ease: 'circInOut' }}
                   initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
+                  animate={{ opacity: handIndex === index ? 1 : 0 }}
                   exit={{ opacity: 0 }}
                 >
-                  {cardsAreShowing ? cardValSum[handIndex] : ''}
+                  {cardsAreShowing ? cardValSum[index] : ''}
                 </motion.div>
                 {hand.map((card, cardIndex) => {
                   return (
