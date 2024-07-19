@@ -41,7 +41,12 @@ export default function DealerCardsContainer() {
               className="face-down-card"
               transition={{ duration: hiddenCard ? 0 : 0.5, ease: 'circInOut' }}
               initial={{ duration: 0, rotateY: 180, perspective: 1000, opacity: 0 }}
-              animate={{ rotateY: hiddenCard ? 180 : 0, perspective: 1000, opacity: 1 }}
+              animate={{
+                rotateY: hiddenCard ? 180 : 0,
+                perspective: 1000,
+                opacity: 1,
+                maxWidth: `calc((100%  - var(--card-width) - 1.5svh) / ${dealerCards.length - 1})`,
+              }}
               exit={{ opacity: 0 }}
             >
               <motion.div
@@ -78,7 +83,11 @@ export default function DealerCardsContainer() {
                   className="face-down-card"
                   transition={{ duration: 0.5, delay: 0, ease: 'circInOut' }}
                   initial={{ opacity: 0, perspective: 1000 }}
-                  animate={{ opacity: 1, perspective: 1000 }}
+                  animate={{
+                    opacity: 1,
+                    perspective: 1000,
+                    maxWidth: `calc((100%  - var(--card-width) - 1.5svh) / ${dealerCards.length - 1})`,
+                  }}
                   key={`${card.name}-${index}`}
                 >
                   <motion.div

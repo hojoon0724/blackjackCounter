@@ -13,22 +13,32 @@
 }
 
 .dealer-cards-container {
-  padding: 6px;
   border-radius: 8px;
   display: flex;
   flex-direction: row-reverse;
   justify-content: flex-start;
   align-items: center;
-  box-sizing: content-box;
+}
+
+.dealer-cards-container > .face-down-card:last-child {
+  width: var(--card-width);
+  max-width: none;
+}
+
+.dealer-card-value {
+  padding: 12px;
 }
 
 .card-container,
 .face-down-card {
-  box-sizing: content-box;
-  /* width: calc(var(--card-width) + 1.5svh); */
   height: var(--card-height);
   display: flex;
-  /* margin-right: 0.75svh; */
+}
+
+.face-down-card {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .card-container {
