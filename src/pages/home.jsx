@@ -20,7 +20,7 @@ export default function Home() {
   const [dealerCards, setDealerCards] = useState([]);
   const [hiddenCard, setHiddenCard] = useState(true);
   const [playerCards, setPlayerCards] = useState([[]]);
-  const [handIndex, setHandIndex] = useState(0);
+  const [currentHandIndex, setCurrentHandIndex] = useState(0);
 
   const [dealButton, disableDealButton] = useState(false);
   const [splitButton, disableSplitButton] = useState(true);
@@ -79,7 +79,7 @@ export default function Home() {
       setIsShuffled(false);
     }
 
-    setHandIndex(0);
+    setCurrentHandIndex(0);
     setGameInProgress(true);
     setHiddenCard(true);
     disableDealButton(true);
@@ -120,59 +120,56 @@ export default function Home() {
   // }
 
   function dealCard(targetArray) {
-    console.log(`target arr:`);
-    console.log(`${targetArray}`);
     setPile([...pile, playingDeck[deckIndex]]);
 
     let updatedHand = [...targetArray, playingDeck[deckIndex]];
     setDeckIndex(prevIndex => prevIndex + 1);
-    console.log(`this goes to player[${handIndex}]`);
-    console.log(updatedHand);
     return updatedHand;
   }
 
-  function split(handIndex) {
+  function split(currentHandIndex) {
     // disableSurrenderButton(true);
     if (playerCards[0][0].value === 1 && playerCards[0][1].value === 1) {
       console.log('split aces');
     }
 
     let updatedPlayerCards = [];
-    updatedPlayerCards.push([playerCards[handIndex][0]]);
-    updatedPlayerCards.push([playerCards[handIndex][1]]);
-    updatedPlayerCards[handIndex] = dealCard(updatedPlayerCards[handIndex]);
+    updatedPlayerCards.push([playerCards[currentHandIndex][0]]);
+    updatedPlayerCards.push([playerCards[currentHandIndex][1]]);
+    updatedPlayerCards[currentHandIndex] = dealCard(updatedPlayerCards[currentHandIndex]);
     setPlayerCards(updatedPlayerCards);
   }
 
-  function double(handIndex) {
+  function double(currentHandIndex) {
     disableSurrenderButton(true);
-    let currentHand = dealCard(playerCards[handIndex]);
+    let currentHand = dealCard(playerCards[currentHandIndex]);
 
     let updatedPlayerCards = playerCards;
-    updatedPlayerCards[handIndex] = dealCard(playerCards[handIndex]);
+    updatedPlayerCards[currentHandIndex] = dealCard(playerCards[currentHandIndex]);
 
     setPlayerCards(updatedPlayerCards);
     checkBust(currentHand);
     stand();
   }
 
-  function hit(handIndex) {
+  function hit(currentHandIndex) {
     disableSurrenderButton(true);
     disableDoubleButton(true);
     // disableSplitButton(true);
 
-    let currentHand = dealCard(playerCards[handIndex]);
+    let currentHand = dealCard(playerCards[currentHandIndex]);
 
     let updatedPlayerCards = playerCards;
-    updatedPlayerCards[handIndex] = dealCard(playerCards[handIndex]);
+    updatedPlayerCards[currentHandIndex] = dealCard(playerCards[currentHandIndex]);
 
     setPlayerCards(updatedPlayerCards);
     checkBust(currentHand);
   }
 
-  function stand(handIndex) {
-    if (playerCards.length - 1 > handIndex) {
-      setHandIndex(handIndex + 1);
+  function stand(currentHandIndex) {
+    if (playerCards.length - 1 > currentHandIndex) {
+      setCurrentHandIndex(currentHandIndex + 1);
+      hit(currentHandIndex + 1);
     } else {
       disableAllButtons();
       setTimeout(() => {
@@ -293,23 +290,23 @@ export default function Home() {
       disabled: dealButton,
     },
     split: {
-      func: handIndex => () => split(handIndex),
+      func: currentHandIndex => () => split(currentHandIndex),
       disabled: splitButton,
     },
     double: {
-      func: handIndex => () => double(handIndex),
+      func: currentHandIndex => () => double(currentHandIndex),
       disabled: doubleButton,
     },
     hit: {
-      func: handIndex => () => hit(handIndex),
+      func: currentHandIndex => () => hit(currentHandIndex),
       disabled: hitButton,
     },
     stand: {
-      func: handIndex => () => stand(handIndex),
+      func: currentHandIndex => () => stand(currentHandIndex),
       disabled: standButton,
     },
     surrender: {
-      func: () => surrender(),
+      func: currentHandIndex => () => surrender(currentHandIndex),
       disabled: surrenderButton,
     },
     resetDeck: {
@@ -339,7 +336,7 @@ export default function Home() {
       console.log(`isShuffled = ${isShuffled}`);
       console.log(`gameInProgress = ${gameInProgress}`);
       console.log(`hiddenCard = ${hiddenCard}`);
-      console.log(`handIndex = ${handIndex}`);
+      console.log(`currentHandIndex = ${currentHandIndex}`);
       console.log(`settingsModalIsOpen = ${settingsModalIsOpen}`);
     },
     printAce: () => console.log(sumWithAce(playerCards[0])),
@@ -371,8 +368,8 @@ export default function Home() {
         setHiddenCard,
         playerCards,
         setPlayerCards,
-        handIndex,
-        setHandIndex,
+        currentHandIndex,
+        setCurrentHandIndex,
 
         dealButton,
         disableDealButton,

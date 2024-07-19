@@ -4,8 +4,12 @@ import { useState, useEffect, useContext } from 'react';
 import { GameContext } from '../../pages/home';
 
 export default function DealerCardsContainer() {
-  const { dealerCards, setDealerCards, hiddenCard, setHiddenCard, gameInProgress, setGameInProgress } =
-    useContext(GameContext);
+  const {
+    dealerCards,
+    // setDealerCards,
+    hiddenCard,
+    // setHiddenCard, gameInProgress, setGameInProgress
+  } = useContext(GameContext);
 
   const [containerWidth, setContainerWidth] = useState('calc(var(--card-width) + 1.5svh)');
   const [cardValSum, setCardValSum] = useState(0);

@@ -3,7 +3,7 @@ import { GameContext } from '../../pages/home';
 import { useContext } from 'react';
 
 export default function GameActionButtons() {
-  const { actions, gameInProgress, handIndex } = useContext(GameContext);
+  const { actions, gameInProgress, currentHandIndex } = useContext(GameContext);
 
   if (gameInProgress) {
     return (
@@ -13,7 +13,7 @@ export default function GameActionButtons() {
           whileHover={{ scale: 1.2 }}
           disabled={actions.split.disabled}
           className="action-button action-split"
-          onClick={actions.split.func(handIndex)}
+          onClick={actions.split.func(currentHandIndex)}
         >
           Split
         </motion.button>
@@ -22,7 +22,7 @@ export default function GameActionButtons() {
           whileHover={{ scale: 1.2 }}
           disabled={actions.double.disabled}
           className="action-button action-double"
-          onClick={actions.double.func(handIndex)}
+          onClick={actions.double.func(currentHandIndex)}
         >
           Double
         </motion.button>
@@ -31,7 +31,7 @@ export default function GameActionButtons() {
           whileHover={{ scale: 1.2 }}
           disabled={actions.hit.disabled}
           className="action-button action-hit"
-          onClick={actions.hit.func(handIndex)}
+          onClick={actions.hit.func(currentHandIndex)}
         >
           Hit
         </motion.button>
@@ -40,7 +40,7 @@ export default function GameActionButtons() {
           whileHover={{ scale: 1.2 }}
           disabled={actions.stand.disabled}
           className="action-button action-stand"
-          onClick={actions.stand.func(handIndex)}
+          onClick={actions.stand.func(currentHandIndex)}
         >
           Stand
         </motion.button>
