@@ -27,9 +27,11 @@ export default function PlayerHand({ hand, handIndex }) {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       >
-        {handIndex === currentHandIndex ? handValSum : ''}
+        {handIndex <= currentHandIndex ? handValSum : ''}
       </motion.div>
-      <Card hand={hand} />
+      {hand.map((card, cardIndex) => (
+        <Card card={card} cardIndex={cardIndex} />
+      ))}
     </>
   );
 }

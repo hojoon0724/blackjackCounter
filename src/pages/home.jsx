@@ -49,12 +49,6 @@ export default function Home() {
     }
   }, [deckAmount]);
 
-  // useEffect(() => {
-  //   if (needsShuffle && !isShuffled) {
-  //     shuffleDecks();
-  //   }
-  // }, [needsShuffle, isShuffled]);
-
   // Game Logic Functions
 
   function shuffleDecks() {
@@ -104,7 +98,7 @@ export default function Home() {
     disableStandButton(false);
     disableSurrenderButton(false);
 
-    if (sumFinalValues(playerCards[0]) === 21) {
+    if (sumFinalValues(updatedPlayerCards[0]) === 21) {
       stand();
     }
 
@@ -133,9 +127,11 @@ export default function Home() {
       console.log('split aces');
     }
 
-    let updatedPlayerCards = [];
-    updatedPlayerCards.push([playerCards[currentHandIndex][0]]);
-    updatedPlayerCards.push([playerCards[currentHandIndex][1]]);
+    let updatedPlayerCards = playerCards;
+    let newHandArray = [updatedPlayerCards[currentHandIndex][1]];
+    updatedPlayerCards[currentHandIndex].pop();
+    updatedPlayerCards.push(newHandArray);
+
     updatedPlayerCards[currentHandIndex] = dealCard(updatedPlayerCards[currentHandIndex]);
     setPlayerCards(updatedPlayerCards);
   }
