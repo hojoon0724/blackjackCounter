@@ -36,6 +36,8 @@ export default function Home() {
   const hasInitialized = useRef(false);
   const mitCount = sumMitCount(pile);
 
+  const [gameCount, setGameCount] = useState(0);
+
   useEffect(() => {
     if (!hasInitialized.current) {
       function initializeDeck() {
@@ -109,10 +111,6 @@ export default function Home() {
     disableSplitButton(false);
   }
 
-  // function makeDealingOrder() {
-  //   return [setPlayerCards(), setDealerCards()];
-  // }
-
   function dealCard(targetArray) {
     setPile([...pile, playingDeck[deckIndex]]);
 
@@ -145,7 +143,7 @@ export default function Home() {
 
     setPlayerCards(updatedPlayerCards);
     checkBust(currentHand);
-    stand();
+    stand(currentHandIndex);
   }
 
   function hit(currentHandIndex) {
@@ -158,6 +156,10 @@ export default function Home() {
     let updatedPlayerCards = playerCards;
     updatedPlayerCards[currentHandIndex] = dealCard(playerCards[currentHandIndex]);
 
+    if (sumFinalValues(updatedPlayerCards[currentHandIndex]) === 21) {
+      stand(currentHandIndex);
+    }
+
     setPlayerCards(updatedPlayerCards);
     checkBust(currentHand);
   }
@@ -167,6 +169,7 @@ export default function Home() {
       setCurrentHandIndex(currentHandIndex + 1);
       hit(currentHandIndex + 1);
     } else {
+      console.log('starting stand-else portion');
       disableAllButtons();
       setTimeout(() => {
         setHiddenCard(false);
@@ -199,56 +202,50 @@ export default function Home() {
     disableDealButton(false);
   }
 
-  function win() {
-    console.log('win');
-    setGameInProgress(false);
-    resetButtons();
+  function win(handIndex) {
+    console.log(handIndex, 'win');
   }
 
-  function lose() {
-    console.log('lose');
-    setGameInProgress(false);
-    resetButtons();
+  function lose(handIndex) {
+    console.log(handIndex, 'lose');
   }
 
-  function push() {
-    console.log('push');
-    setGameInProgress(false);
-    resetButtons();
+  function push(handIndex) {
+    console.log(handIndex, 'push');
   }
 
   function checkBust(cardsDealt) {
-    console.log('-----checkBust-----');
-    console.log(cardsDealt);
-    console.log(sumFinalValues(cardsDealt));
-    if (sumFinalValues(cardsDealt) === 21) {
-      stand();
-    } else if (sumFinalValues(cardsDealt) > 21) {
-      setTimeout(() => {
-        setHiddenCard(false);
-      }, 500);
-      setTimeout(() => {
-        lose();
-      }, 1000);
+    if (sumFinalValues(cardsDealt) >= 21) {
+      stand(currentHandIndex);
     }
   }
 
   function checkOutcome(dealerBust) {
     checkNeedsShuffle(cutIndex, deckIndex);
 
-    if (dealerBust === true) {
-      console.log(`result: player: ${sumFinalValues(playerCards[0])} // ${sumFinalValues(dealerCards)}`);
-      win();
-    } else if (sumFinalValues(playerCards[0]) === sumFinalValues(dealerCards)) {
-      console.log(`result: player: ${sumFinalValues(playerCards[0])} // ${sumFinalValues(dealerCards)}`);
-      push();
-    } else if (sumFinalValues(playerCards[0]) < sumFinalValues(dealerCards)) {
-      console.log(`result: player: ${sumFinalValues(playerCards[0])} // ${sumFinalValues(dealerCards)}`);
-      lose();
-    } else if (sumFinalValues(playerCards[0]) > sumFinalValues(dealerCards)) {
-      console.log(`result: player: ${sumFinalValues(playerCards[0])} // ${sumFinalValues(dealerCards)}`);
-      win();
+    for (let handIndex in playerCards) {
+      console.log(handIndex, sumFinalValues(playerCards[handIndex]));
+      let playerSumVal = sumFinalValues(playerCards[handIndex]);
+      let dealerSumVal = sumFinalValues(dealerCards);
+      if (playerSumVal > 21) {
+        lose(handIndex);
+      } else if (dealerBust) {
+        win(handIndex);
+      } else {
+        if (playerSumVal > dealerSumVal) {
+          win(handIndex);
+        } else if (playerSumVal === dealerSumVal) {
+          push(handIndex);
+        } else if (playerSumVal < dealerSumVal) {
+          lose(handIndex);
+        }
+      }
     }
+
+    setGameInProgress(false);
+    resetButtons();
+    console.log(gameCount);
+    setGameCount(gameCount + 1);
   }
 
   function dealerPlay() {

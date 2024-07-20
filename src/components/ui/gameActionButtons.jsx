@@ -4,13 +4,25 @@ import { useContext } from 'react';
 
 export default function GameActionButtons() {
   const { actions, gameInProgress, currentHandIndex } = useContext(GameContext);
+  const animationButton = {
+    tapScale: 0.95,
+    hoverScale: 1.05,
+    duration: 0.1,
+  };
 
   if (gameInProgress) {
     return (
-      <motion.div animate={{ opacity: gameInProgress ? 1 : 0 }} className="actions-container flex-row">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: gameInProgress ? 1 : 0 }}
+        transition={{ duration: 1, delay: 0.5 }}
+        exit={{ opacity: 0 }}
+        className="actions-container flex-row"
+      >
         <motion.button
-          whileTap={{ scale: 0.9 }}
-          whileHover={{ scale: 1.2 }}
+          whileTap={{ scale: animationButton.tapScale }}
+          whileHover={{ scale: animationButton.hoverScale }}
+          transition={{ duration: animationButton.duration }}
           disabled={actions.split.disabled}
           className="action-button action-split"
           onClick={actions.split.func(currentHandIndex)}
@@ -18,8 +30,9 @@ export default function GameActionButtons() {
           Split
         </motion.button>
         <motion.button
-          whileTap={{ scale: 0.9 }}
-          whileHover={{ scale: 1.2 }}
+          whileTap={{ scale: animationButton.tapScale }}
+          whileHover={{ scale: animationButton.hoverScale }}
+          transition={{ duration: animationButton.duration }}
           disabled={actions.double.disabled}
           className="action-button action-double"
           onClick={actions.double.func(currentHandIndex)}
@@ -27,8 +40,9 @@ export default function GameActionButtons() {
           Double
         </motion.button>
         <motion.button
-          whileTap={{ scale: 0.9 }}
-          whileHover={{ scale: 1.2 }}
+          whileTap={{ scale: animationButton.tapScale }}
+          whileHover={{ scale: animationButton.hoverScale }}
+          transition={{ duration: animationButton.duration }}
           disabled={actions.hit.disabled}
           className="action-button action-hit"
           onClick={actions.hit.func(currentHandIndex)}
@@ -36,8 +50,9 @@ export default function GameActionButtons() {
           Hit
         </motion.button>
         <motion.button
-          whileTap={{ scale: 0.9 }}
-          whileHover={{ scale: 1.2 }}
+          whileTap={{ scale: animationButton.tapScale }}
+          whileHover={{ scale: animationButton.hoverScale }}
+          transition={{ duration: animationButton.duration }}
           disabled={actions.stand.disabled}
           className="action-button action-stand"
           onClick={actions.stand.func(currentHandIndex)}
@@ -45,8 +60,9 @@ export default function GameActionButtons() {
           Stand
         </motion.button>
         <motion.button
-          whileTap={{ scale: 0.9 }}
-          whileHover={{ scale: 1.2 }}
+          whileTap={{ scale: animationButton.tapScale }}
+          whileHover={{ scale: animationButton.hoverScale }}
+          transition={{ duration: animationButton.duration }}
           disabled={actions.surrender.disabled}
           className="action-button action-surrender"
           onClick={actions.surrender.func}
@@ -57,7 +73,13 @@ export default function GameActionButtons() {
     );
   } else {
     return (
-      <motion.div animate={{ display: gameInProgress ? 0 : 1 }} className="actions-container flex-row">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: gameInProgress ? 0 : 1 }}
+        transition={{ duration: 1, delay: 0.5 }}
+        exit={{ opacity: 0 }}
+        className="actions-container flex-row"
+      >
         <motion.button
           whileTap={{ scale: 0.9 }}
           whileHover={{ scale: 1.2 }}

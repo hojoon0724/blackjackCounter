@@ -46,7 +46,6 @@
 }
 
 .actions-container {
-  box-sizing: border-box;
   align-self: center;
   justify-self: center;
   justify-content: center;
@@ -58,9 +57,26 @@
 
 .action-button,
 .deal-button {
+  font-size: 1rem;
   min-width: 11ch;
-  box-sizing: border-box;
-  padding: 6px 6px;
+  padding: 8px;
+  border-radius: 2em;
+  background-color: #e8e8e8;
+  color: #000000;
+  border: none;
+}
+
+.action-button:disabled,
+button[disabled] {
+  font-size: 1rem;
+  min-width: 11ch;
+  padding: 8px;
+  border-radius: 2em;
+  background-color: #e8e8e8;
+  color: #000000;
+  border: none;
+
+  opacity: 0.3;
 }
 
 .action-button {

@@ -30,7 +30,7 @@ export default function PlayerHand({ hand, handIndex }) {
         {handIndex <= currentHandIndex ? handValSum : ''}
       </motion.div>
       {hand.map((card, cardIndex) => (
-        <Card card={card} cardIndex={cardIndex} />
+        <Card card={card} cardIndex={cardIndex} key={`${card.name}-${card.deckNum}`} />
       ))}
     </>
   );
