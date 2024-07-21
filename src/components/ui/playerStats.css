@@ -1,0 +1,43 @@
+.player-stats-container {
+  width: 100%;
+  justify-content: space-between;
+  position: relative;
+}
+.player-stats {
+  width: fit-content;
+  justify-content: space-between;
+  position: absolute;
+  bottom: 0;
+  padding: 10px;
+}
+.game-count-container,
+.win-count-container,
+.push-count-container,
+.lose-count-container {
+  padding-top: 6px;
+  min-width: 10ch;
+  justify-content: space-between;
+}
+.game-count-label,
+.win-count-label,
+.push-count-label,
+.lose-count-label {
+}
+
+.game-count-amount,
+.win-count-amount,
+.push-count-amount,
+.lose-count-amount {
+  min-width: 2ch;
+}
+.player-bank {
+  padding: 8px;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+.bank-label {
+  padding-right: 1ch;
+}
+.bank-amount {
+}

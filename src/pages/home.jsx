@@ -4,6 +4,7 @@ import BottomBar from '../components/ui/bottomBar';
 import PlayArea from '../components/playArea/playArea';
 
 import { cardDeckAssembly, shuffleDeck, sumFinalValues, sumMitCount, sumWithAce } from '../gameLogic/calculations';
+import PlayerStats from '../components/ui/playerStats';
 
 export const GameContext = createContext();
 
@@ -37,11 +38,15 @@ export default function Home() {
   const [pushCount, setPushCount] = useState(0);
   const [loseCount, setLoseCount] = useState(0);
 
+  const [bank, setBank] = useState(10000);
+  const [betAmount, setBetAmount] = useState(10);
+
   const hasInitialized = useRef(false);
   const mitCount = sumMitCount(pile);
+  let winnings = 0;
 
-  // eslint-disable-next-linea
   let cardIndexModifier = -1;
+  let currentHand = [];
 
   useEffect(() => {
     if (!hasInitialized.current) {
@@ -100,7 +105,7 @@ export default function Home() {
     disableSurrenderButton(false);
 
     if (sumFinalValues(playersHand[0]) === 21) {
-      stand(currentHandIndex);
+      win(currentHandIndex);
     }
 
     // if (playersHand.length >= 2 && playersHand[0].value === playersHand[1].value) {
@@ -126,6 +131,7 @@ export default function Home() {
   }
 
   function double(currentHandIndex) {
+    winnings = betAmount * 2;
     let updatedPlayerCards = [...playerCards];
     updatedPlayerCards[currentHandIndex] = dealCard(playerCards[currentHandIndex]);
     setPlayerCards(updatedPlayerCards);
@@ -146,6 +152,8 @@ export default function Home() {
   }
 
   function stand(currentHandIndex) {
+    if (currentHand.length !== 0) {
+    }
     if (playerCards.length - 1 > currentHandIndex) {
       setCurrentHandIndex(currentHandIndex + 1);
       hit(currentHandIndex + 1);
@@ -183,6 +191,10 @@ export default function Home() {
     return deckIndex + cardIndexModifier;
   }
 
+  function writeTempArr() {
+    currentHand = playerCards[currentHandIndex];
+  }
+
   function dealCard(targetArray) {
     const newCard = playingDeck[nextCardsIndex()];
     setPile([...pile, newCard]);
@@ -208,7 +220,7 @@ export default function Home() {
         if (sumFinalValues(updatedDealerCards) > 21) {
           dealerBust = true;
         }
-        checkOutcome(dealerBust);
+        checkOutcome(dealerBust, updatedDealerCards);
       }
     }
     drawCard();
@@ -234,9 +246,9 @@ export default function Home() {
   // - Outcome Logic
   // -----------------------------------------------------
 
-  function compareHands(handIndex) {
+  function compareHands(handIndex, updatedDealerCards) {
     let playerVal = sumFinalValues(playerCards[handIndex]);
-    let dealerVal = sumFinalValues(dealerCards);
+    let dealerVal = sumFinalValues(updatedDealerCards);
     if (playerVal > 21) {
       lose(handIndex);
     } else if (playerVal === dealerVal) {
@@ -249,16 +261,17 @@ export default function Home() {
   }
 
   function didBust(handArray) {
-    if (sumFinalValues(handArray) >= 21) {
+    if (sumFinalValues(handArray) > 21) {
       return true;
     } else {
       return false;
     }
   }
 
-  function checkOutcome(dealerBust) {
+  function checkOutcome(dealerBust, updatedDealerCards) {
     if (dealerBust) {
       for (let handIndex in playerCards) {
+        console.log(`${sumFinalValues(playerCards[handIndex])} || ${sumFinalValues(updatedDealerCards)}`);
         if (didBust(playerCards[handIndex])) {
           lose(handIndex);
         } else {
@@ -267,23 +280,33 @@ export default function Home() {
       }
     } else {
       for (let handIndex in playerCards) {
-        compareHands(handIndex);
+        console.log(`${sumFinalValues(playerCards[handIndex])} || ${sumFinalValues(updatedDealerCards)}`);
+        compareHands(handIndex, updatedDealerCards);
       }
     }
 
     setGameInProgress(false);
     resetButtons();
     setGameCount(prevCount => prevCount + 1);
-    console.log(gameCount);
   }
 
   function win(handIndex) {
     setWinCount(prevCount => prevCount + 1);
+    winnings += betAmount;
+    console.log(bank);
+    console.log(`bet ${betAmount}`);
+    console.log(`winnings ${winnings}`);
+    setBank(bank + winnings);
     console.log(handIndex, 'win');
   }
 
   function lose(handIndex) {
     setLoseCount(prevCount => prevCount + 1);
+    winnings -= betAmount;
+    console.log(bank);
+    console.log(`bet ${betAmount}`);
+    console.log(`losses ${winnings}`);
+    setBank(bank + winnings);
     console.log(handIndex, 'lose');
   }
 
@@ -351,12 +374,9 @@ export default function Home() {
     printDeckCount: () => console.log(playingDeck.length),
     printPile: () => console.log(pile),
     printStates: () => {
-      console.log(`needsShuffle = ${needsShuffle}`);
-      console.log(`isShuffled = ${isShuffled}`);
-      console.log(`gameInProgress = ${gameInProgress}`);
-      console.log(`hiddenCard = ${hiddenCard}`);
-      console.log(`currentHandIndex = ${currentHandIndex}`);
-      console.log(`settingsModalIsOpen = ${settingsModalIsOpen}`);
+      // console.log(`x = ${x}`);
+      console.log(`winnings = ${winnings}`);
+      console.log(`betAmount = ${betAmount}`);
     },
     printAce: () => console.log(sumWithAce(playerCards[0])),
     // checkNum: () => checkNum(),
@@ -409,6 +429,10 @@ export default function Home() {
         setPushCount,
         loseCount,
         setLoseCount,
+        bank,
+        setBank,
+        betAmount,
+        setBetAmount,
 
         hasInitialized,
         mitCount,
@@ -420,6 +444,7 @@ export default function Home() {
       <div className="top flex-column">
         <TopBar />
         <PlayArea />
+        <PlayerStats />
         <BottomBar />
       </div>
     </GameContext.Provider>

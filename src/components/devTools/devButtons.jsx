@@ -11,7 +11,7 @@ export default function DevButtons() {
         position: 'absolute',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'flex-end',
+        justifyContent: 'center',
         height: '100%',
         left: 0,
         paddingBottom: '80px',
