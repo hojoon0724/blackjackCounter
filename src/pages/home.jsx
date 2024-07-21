@@ -12,7 +12,7 @@ export default function Home() {
   const [playingDeck, setPlayingDeck] = useState([]);
 
   const [deckIndex, setDeckIndex] = useState(0);
-  const [cutIndex, setCutIndex] = useState(6);
+  const [cutIndex, setCutIndex] = useState(deckAmount * 48);
   const [needsShuffle, setNeedsShuffle] = useState(false);
   const [isShuffled, setIsShuffled] = useState(true);
 
@@ -22,7 +22,6 @@ export default function Home() {
   const [playerCards, setPlayerCards] = useState([[]]);
   const [currentHandIndex, setCurrentHandIndex] = useState(0);
 
-  const [dealButton, disableDealButton] = useState(false);
   const [splitButton, disableSplitButton] = useState(true);
   const [doubleButton, disableDoubleButton] = useState(true);
   const [hitButton, disableHitButton] = useState(true);
@@ -33,10 +32,16 @@ export default function Home() {
 
   const [pile, setPile] = useState([]);
 
+  const [gameCount, setGameCount] = useState(0);
+  const [winCount, setWinCount] = useState(0);
+  const [pushCount, setPushCount] = useState(0);
+  const [loseCount, setLoseCount] = useState(0);
+
   const hasInitialized = useRef(false);
   const mitCount = sumMitCount(pile);
 
-  const [gameCount, setGameCount] = useState(0);
+  // eslint-disable-next-linea
+  let cardIndexModifier = -1;
 
   useEffect(() => {
     if (!hasInitialized.current) {
@@ -51,24 +56,18 @@ export default function Home() {
     }
   }, [deckAmount]);
 
-  // Game Logic Functions
-
   function shuffleDecks() {
-    setPlayingDeck([]);
-    setDealerCards([]);
-    setPlayerCards([[]]);
-    setPile([]);
-    setDeckIndex(0);
-    resetButtons();
-
     let cardDeck = cardDeckAssembly(deckAmount);
     let shuffledDeck = shuffleDeck(cardDeck);
     setPlayingDeck(shuffledDeck);
-    // setCutIndex(shuffleDeck.length - 30);
     setIsShuffled(true);
     setNeedsShuffle(false);
     setGameInProgress(false);
   }
+
+  // -----------------------------------------------------
+  // - Play Logic
+  // -----------------------------------------------------
 
   function deal() {
     if (needsShuffle === true) {
@@ -78,20 +77,20 @@ export default function Home() {
     setCurrentHandIndex(0);
     setGameInProgress(true);
     setHiddenCard(true);
-    disableDealButton(true);
-    let updatedDealerCards = [];
-    let updatedPlayerCards = [[]];
+    let dealersHand = [];
+    let playersHand = [[]];
     let cardsToPile = [...pile];
 
+    // use dealCard function to deal
     for (let i = 0; i < 4; i = i + 2) {
-      updatedPlayerCards[0].push(playingDeck[deckIndex + i]);
+      playersHand[0].push(playingDeck[deckIndex + i]);
       cardsToPile.push(playingDeck[deckIndex + i]);
-      updatedDealerCards.push(playingDeck[deckIndex + i + 1]);
+      dealersHand.push(playingDeck[deckIndex + i + 1]);
       cardsToPile.push(playingDeck[deckIndex + i + 1]);
     }
 
-    setPlayerCards(updatedPlayerCards);
-    setDealerCards(updatedDealerCards);
+    setPlayerCards(playersHand);
+    setDealerCards(dealersHand);
     setPile(cardsToPile);
     setDeckIndex(deckIndex + 4);
 
@@ -100,68 +99,50 @@ export default function Home() {
     disableStandButton(false);
     disableSurrenderButton(false);
 
-    if (sumFinalValues(updatedPlayerCards[0]) === 21) {
-      stand();
+    if (sumFinalValues(playersHand[0]) === 21) {
+      stand(currentHandIndex);
     }
 
-    // if (updatedPlayerCards.length >= 2 && updatedPlayerCards[0].value === updatedPlayerCards[1].value) {
-    //   console.log(`same values ${updatedPlayerCards[0].value} // ${updatedPlayerCards[1].value}`);
+    // if (playersHand.length >= 2 && playersHand[0].value === playersHand[1].value) {
+    //   console.log(`same values ${playersHand[0].value} // ${playersHand[1].value}`);
     //   disableSplitButton(false);
     // }
     disableSplitButton(false);
   }
 
-  function dealCard(targetArray) {
-    setPile([...pile, playingDeck[deckIndex]]);
-
-    let updatedHand = [...targetArray, playingDeck[deckIndex]];
-    setDeckIndex(prevIndex => prevIndex + 1);
-    return updatedHand;
-  }
-
   function split(currentHandIndex) {
-    // disableSurrenderButton(true);
+    disableSurrenderButton(true);
     if (playerCards[0][0].value === 1 && playerCards[0][1].value === 1) {
       console.log('split aces');
     }
 
-    let updatedPlayerCards = playerCards;
+    let updatedPlayerCards = [...playerCards];
     let newHandArray = [updatedPlayerCards[currentHandIndex][1]];
     updatedPlayerCards[currentHandIndex].pop();
-    updatedPlayerCards.push(newHandArray);
+    updatedPlayerCards = [...updatedPlayerCards, newHandArray];
 
     updatedPlayerCards[currentHandIndex] = dealCard(updatedPlayerCards[currentHandIndex]);
     setPlayerCards(updatedPlayerCards);
   }
 
   function double(currentHandIndex) {
-    disableSurrenderButton(true);
-    let currentHand = dealCard(playerCards[currentHandIndex]);
-
-    let updatedPlayerCards = playerCards;
+    let updatedPlayerCards = [...playerCards];
     updatedPlayerCards[currentHandIndex] = dealCard(playerCards[currentHandIndex]);
-
     setPlayerCards(updatedPlayerCards);
-    checkBust(currentHand);
     stand(currentHandIndex);
   }
 
   function hit(currentHandIndex) {
     disableSurrenderButton(true);
     disableDoubleButton(true);
-    // disableSplitButton(true);
 
-    let currentHand = dealCard(playerCards[currentHandIndex]);
-
-    let updatedPlayerCards = playerCards;
+    let updatedPlayerCards = [...playerCards];
     updatedPlayerCards[currentHandIndex] = dealCard(playerCards[currentHandIndex]);
+    setPlayerCards(updatedPlayerCards);
 
-    if (sumFinalValues(updatedPlayerCards[currentHandIndex]) === 21) {
+    if (sumFinalValues(updatedPlayerCards[currentHandIndex]) >= 21) {
       stand(currentHandIndex);
     }
-
-    setPlayerCards(updatedPlayerCards);
-    checkBust(currentHand);
   }
 
   function stand(currentHandIndex) {
@@ -169,7 +150,6 @@ export default function Home() {
       setCurrentHandIndex(currentHandIndex + 1);
       hit(currentHandIndex + 1);
     } else {
-      console.log('starting stand-else portion');
       disableAllButtons();
       setTimeout(() => {
         setHiddenCard(false);
@@ -184,82 +164,45 @@ export default function Home() {
     console.log('surrender');
   }
 
-  function disableAllButtons() {
-    disableDoubleButton(true);
-    disableHitButton(true);
-    disableSplitButton(true);
-    disableSurrenderButton(true);
-    disableStandButton(true);
-    disableDealButton(true);
-  }
+  // -----------------------------------------------------
+  // - Processing Logic
+  // -----------------------------------------------------
 
-  function resetButtons() {
-    disableDoubleButton(true);
-    disableHitButton(true);
-    disableSplitButton(true);
-    disableSurrenderButton(true);
-    disableStandButton(true);
-    disableDealButton(false);
-  }
-
-  function win(handIndex) {
-    console.log(handIndex, 'win');
-  }
-
-  function lose(handIndex) {
-    console.log(handIndex, 'lose');
-  }
-
-  function push(handIndex) {
-    console.log(handIndex, 'push');
-  }
-
-  function checkBust(cardsDealt) {
-    if (sumFinalValues(cardsDealt) >= 21) {
-      stand(currentHandIndex);
-    }
-  }
-
-  function checkOutcome(dealerBust) {
-    checkNeedsShuffle(cutIndex, deckIndex);
-
-    for (let handIndex in playerCards) {
-      console.log(handIndex, sumFinalValues(playerCards[handIndex]));
-      let playerSumVal = sumFinalValues(playerCards[handIndex]);
-      let dealerSumVal = sumFinalValues(dealerCards);
-      if (playerSumVal > 21) {
-        lose(handIndex);
-      } else if (dealerBust) {
-        win(handIndex);
-      } else {
-        if (playerSumVal > dealerSumVal) {
-          win(handIndex);
-        } else if (playerSumVal === dealerSumVal) {
-          push(handIndex);
-        } else if (playerSumVal < dealerSumVal) {
-          lose(handIndex);
-        }
-      }
-    }
-
-    setGameInProgress(false);
+  function resetTable() {
+    setPlayingDeck([]);
+    setDealerCards([]);
+    setPlayerCards([[]]);
+    setPile([]);
+    setDeckIndex(0);
     resetButtons();
-    console.log(gameCount);
-    setGameCount(gameCount + 1);
+  }
+
+  function nextCardsIndex() {
+    cardIndexModifier++;
+    setDeckIndex(prevNum => prevNum + 1);
+    return deckIndex + cardIndexModifier;
+  }
+
+  function dealCard(targetArray) {
+    const newCard = playingDeck[nextCardsIndex()];
+    setPile([...pile, newCard]);
+    let handWithNewCard = [...targetArray, newCard];
+    return handWithNewCard;
   }
 
   function dealerPlay() {
-    let updatedDealerCards = dealerCards;
-    let newCardIndex = deckIndex;
+    let updatedDealerCards = [...dealerCards];
+    let newDrawCardIndex = deckIndex;
     let dealerBust = false;
     function drawCard() {
       if (sumFinalValues(updatedDealerCards) < 17) {
-        updatedDealerCards.push(playingDeck[newCardIndex]);
+        console.log(`deckIndex ${deckIndex}`);
+        console.log(`newDrawCardIndex ${newDrawCardIndex}`);
+        updatedDealerCards.push(playingDeck[newDrawCardIndex]);
         setDealerCards([...updatedDealerCards]);
-        setPile(prevPile => [...prevPile, playingDeck[newCardIndex]]);
-        newCardIndex = newCardIndex + 1;
-        setDeckIndex(prevIndex => prevIndex + 1);
-
+        setPile(prevPile => [...prevPile, playingDeck[newDrawCardIndex]]);
+        newDrawCardIndex++;
+        setDeckIndex(newDrawCardIndex);
         setTimeout(drawCard, 1000);
       } else {
         if (sumFinalValues(updatedDealerCards) > 21) {
@@ -271,16 +214,96 @@ export default function Home() {
     drawCard();
   }
 
-  function checkNeedsShuffle(cutIndex, currentIndex) {
-    if (cutIndex < currentIndex) {
-      setNeedsShuffle(true);
+  function disableAllButtons() {
+    disableDoubleButton(true);
+    disableHitButton(true);
+    disableSplitButton(true);
+    disableSurrenderButton(true);
+    disableStandButton(true);
+  }
+
+  function resetButtons() {
+    disableDoubleButton(true);
+    disableHitButton(true);
+    disableSplitButton(true);
+    disableSurrenderButton(true);
+    disableStandButton(true);
+  }
+
+  // -----------------------------------------------------
+  // - Outcome Logic
+  // -----------------------------------------------------
+
+  function compareHands(handIndex) {
+    let playerVal = sumFinalValues(playerCards[handIndex]);
+    let dealerVal = sumFinalValues(dealerCards);
+    if (playerVal > 21) {
+      lose(handIndex);
+    } else if (playerVal === dealerVal) {
+      push(handIndex);
+    } else if (playerVal > dealerVal) {
+      win(handIndex);
+    } else {
+      lose(handIndex);
     }
   }
 
+  function didBust(handArray) {
+    if (sumFinalValues(handArray) >= 21) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  function checkOutcome(dealerBust) {
+    if (dealerBust) {
+      for (let handIndex in playerCards) {
+        if (didBust(playerCards[handIndex])) {
+          lose(handIndex);
+        } else {
+          win(handIndex);
+        }
+      }
+    } else {
+      for (let handIndex in playerCards) {
+        compareHands(handIndex);
+      }
+    }
+
+    setGameInProgress(false);
+    resetButtons();
+    setGameCount(prevCount => prevCount + 1);
+    console.log(gameCount);
+  }
+
+  function win(handIndex) {
+    setWinCount(prevCount => prevCount + 1);
+    console.log(handIndex, 'win');
+  }
+
+  function lose(handIndex) {
+    setLoseCount(prevCount => prevCount + 1);
+    console.log(handIndex, 'lose');
+  }
+
+  function push(handIndex) {
+    setPushCount(prevCount => prevCount + 1);
+    console.log(handIndex, 'push');
+  }
+
+  // function checkNeedsShuffle(cutIndex, currentIndex) {
+  //   if (cutIndex < currentIndex) {
+  //     setNeedsShuffle(true);
+  //   }
+  // }
+
+  // -----------------------------------------------------
+  // -
+  // -----------------------------------------------------
   const actions = {
     deal: {
       func: () => deal(),
-      disabled: dealButton,
     },
     split: {
       func: currentHandIndex => () => split(currentHandIndex),
@@ -303,7 +326,10 @@ export default function Home() {
       disabled: surrenderButton,
     },
     resetDeck: {
-      func: () => shuffleDecks(),
+      func: () => {
+        resetTable();
+        shuffleDecks();
+      },
       disabled: false,
     },
   };
@@ -333,7 +359,7 @@ export default function Home() {
       console.log(`settingsModalIsOpen = ${settingsModalIsOpen}`);
     },
     printAce: () => console.log(sumWithAce(playerCards[0])),
-    // dealNext: () => dealCard(),
+    // checkNum: () => checkNum(),
   };
 
   return (
@@ -341,7 +367,6 @@ export default function Home() {
       value={{
         deckAmount,
         setDeckAmount,
-
         playingDeck,
         setPlayingDeck,
         deckIndex,
@@ -352,7 +377,6 @@ export default function Home() {
         setNeedsShuffle,
         isShuffled,
         setIsShuffled,
-
         gameInProgress,
         setGameInProgress,
         dealerCards,
@@ -363,9 +387,6 @@ export default function Home() {
         setPlayerCards,
         currentHandIndex,
         setCurrentHandIndex,
-
-        dealButton,
-        disableDealButton,
         splitButton,
         disableSplitButton,
         doubleButton,
@@ -376,12 +397,19 @@ export default function Home() {
         disableStandButton,
         surrenderButton,
         disableSurrenderButton,
-
         settingsModalIsOpen,
         setSettingsModalIsOpen,
-
         pile,
         setPile,
+        gameCount,
+        setGameCount,
+        winCount,
+        setWinCount,
+        pushCount,
+        setPushCount,
+        loseCount,
+        setLoseCount,
+
         hasInitialized,
         mitCount,
 

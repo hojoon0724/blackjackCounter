@@ -17,6 +17,7 @@ export default function DevButtons() {
         paddingBottom: '80px',
       }}
     >
+      {/* 
       <button style={{ fontSize: '1rem', margin: '.5rem' }} onClick={devActions.flipHidden}>
         flipHidden
       </button>
@@ -26,9 +27,7 @@ export default function DevButtons() {
       <button style={{ fontSize: '1rem', margin: '.5rem' }} onClick={devActions.printDealer}>
         dealer array
       </button>
-      <button style={{ fontSize: '1rem', margin: '.5rem' }} onClick={devActions.printPlayer}>
-        printPlayer
-      </button>
+
       <button style={{ fontSize: '1rem', margin: '.5rem' }} onClick={devActions.printDeck}>
         printDeck
       </button>
@@ -38,18 +37,22 @@ export default function DevButtons() {
       <button style={{ fontSize: '1rem', margin: '.5rem' }} onClick={devActions.printPile}>
         printPile
       </button>
-      <button style={{ fontSize: '1rem', margin: '.5rem' }} onClick={devActions.printStates}>
-        printStates
-      </button>
       <button style={{ fontSize: '1rem', margin: '.5rem' }} onClick={devActions.printAce}>
         ace check
       </button>
       <button style={{ fontSize: '1rem', margin: '.5rem' }} onClick={devActions.dealNext}>
         dealNext
+      </button> 
+      <button style={{ fontSize: '1rem', margin: '.5rem' }} onClick={devActions.checkNum}>
+        checkNum
       </button>
-      {/* <button onClick={devActions}></button>
-      <button onClick={devActions}></button>
-      <button onClick={devActions}></button> */}
+      */}
+      <button style={{ fontSize: '1rem', margin: '.5rem' }} onClick={devActions.printStates}>
+        printStates
+      </button>
+      <button style={{ fontSize: '1rem', margin: '.5rem' }} onClick={devActions.printPlayer}>
+        printPlayer
+      </button>
     </div>
   );
 }
