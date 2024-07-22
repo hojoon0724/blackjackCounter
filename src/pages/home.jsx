@@ -191,9 +191,9 @@ export default function Home() {
     return deckIndex + cardIndexModifier;
   }
 
-  function writeTempArr() {
-    currentHand = playerCards[currentHandIndex];
-  }
+  // function writeTempArr() {
+  //   currentHand = playerCards[currentHandIndex];
+  // }
 
   function dealCard(targetArray) {
     const newCard = playingDeck[nextCardsIndex()];
@@ -365,9 +365,7 @@ export default function Home() {
         setHiddenCard(true);
       }
     },
-    addToDealer: () => {
-      setDealerCards([...dealerCards, playingDeck[deckIndex]]);
-    },
+    addToDealer: () => setDealerCards([...dealerCards, playingDeck[deckIndex]]),
     printDealer: () => console.log(dealerCards),
     printPlayer: () => console.log(playerCards),
     printDeck: () => console.log(playingDeck),
