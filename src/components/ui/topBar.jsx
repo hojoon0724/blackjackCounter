@@ -4,7 +4,7 @@ import { GameContext } from '../../pages/home';
 import { useContext } from 'react';
 
 export default function TopBar() {
-  const { setSettingsModalIsOpen, bank } = useContext(GameContext);
+  const { setSettingsModalIsOpen } = useContext(GameContext);
 
   return (
     <div className="top-bar flex-row space-between align-center">
