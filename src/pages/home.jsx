@@ -40,13 +40,16 @@ export default function Home() {
 
   const [bank, setBank] = useState(10000);
   const [betAmount, setBetAmount] = useState(10);
+  const [betAmountArray, setBetAmountArray] = useState([betAmount]);
 
   const hasInitialized = useRef(false);
   const mitCount = sumMitCount(pile);
   let winnings = 0;
 
   let cardIndexModifier = -1;
-  let currentHand = [];
+  let dealerCardsTestArray = [];
+  let playerCardsTestArray = [];
+  let betAmountTestArray = [];
 
   useEffect(() => {
     if (!hasInitialized.current) {
@@ -80,6 +83,7 @@ export default function Home() {
     }
 
     setCurrentHandIndex(0);
+    setBetAmountArray([betAmount]);
     setGameInProgress(true);
     setHiddenCard(true);
     let dealersHand = [];
@@ -103,9 +107,12 @@ export default function Home() {
     disableHitButton(false);
     disableStandButton(false);
     disableSurrenderButton(false);
+    playerCardsTestArray = [playersHand];
+    dealerCardsTestArray = dealersHand;
 
     if (sumFinalValues(playersHand[0]) === 21) {
-      win(currentHandIndex);
+      betAmountTestArray[0] = betAmount * 1.5;
+      stand(currentHandIndex);
     }
 
     // if (playersHand.length >= 2 && playersHand[0].value === playersHand[1].value) {
@@ -125,38 +132,66 @@ export default function Home() {
     let newHandArray = [updatedPlayerCards[currentHandIndex][1]];
     updatedPlayerCards[currentHandIndex].pop();
     updatedPlayerCards = [...updatedPlayerCards, newHandArray];
+    let updatedBetAmountArray = [...betAmountArray, betAmount];
+    setBetAmountArray(updatedBetAmountArray);
 
     updatedPlayerCards[currentHandIndex] = dealCard(updatedPlayerCards[currentHandIndex]);
+    if (sumFinalValues(newHandArray) === 21) {
+      stand(currentHandIndex);
+    }
     setPlayerCards(updatedPlayerCards);
   }
 
   function double(currentHandIndex) {
-    winnings = betAmount * 2;
+    let updatedBetAmountArray = [...betAmountArray];
+    updatedBetAmountArray[currentHandIndex] = updatedBetAmountArray[currentHandIndex] * 2;
+    betAmountTestArray = updatedBetAmountArray;
+    setBetAmountArray(updatedBetAmountArray);
+
     let updatedPlayerCards = [...playerCards];
     updatedPlayerCards[currentHandIndex] = dealCard(playerCards[currentHandIndex]);
+    playerCardsTestArray = updatedPlayerCards;
     setPlayerCards(updatedPlayerCards);
     stand(currentHandIndex);
   }
 
   function hit(currentHandIndex) {
     disableSurrenderButton(true);
-    disableDoubleButton(true);
+    disableSplitButton(true);
 
-    let updatedPlayerCards = [...playerCards];
+    let updatedPlayerCards = [];
+    if (playerCardsTestArray.length === 0) {
+      updatedPlayerCards = [...playerCards];
+    } else {
+      updatedPlayerCards = [...playerCardsTestArray];
+    }
     updatedPlayerCards[currentHandIndex] = dealCard(playerCards[currentHandIndex]);
+    if (updatedPlayerCards.length >= 2) {
+      disableDoubleButton(false);
+    } else {
+      disableDoubleButton(true);
+    }
+    playerCardsTestArray = updatedPlayerCards;
     setPlayerCards(updatedPlayerCards);
 
-    if (sumFinalValues(updatedPlayerCards[currentHandIndex]) >= 21) {
+    if (sumFinalValues(updatedPlayerCards[currentHandIndex]) === 21) {
       stand(currentHandIndex);
+    }
+    if (sumFinalValues(updatedPlayerCards[currentHandIndex]) > 21) {
+      if (updatedPlayerCards.length <= 1) {
+        lose(currentHandIndex);
+      } else {
+        stand(currentHandIndex);
+      }
+      // If 2+hand = stand, dealer plays
     }
   }
 
   function stand(currentHandIndex) {
-    if (currentHand.length !== 0) {
-    }
     if (playerCards.length - 1 > currentHandIndex) {
       setCurrentHandIndex(currentHandIndex + 1);
       hit(currentHandIndex + 1);
+      disableDoubleButton(false);
     } else {
       disableAllButtons();
       setTimeout(() => {
@@ -191,6 +226,21 @@ export default function Home() {
     return deckIndex + cardIndexModifier;
   }
 
+  function updateCardsTestArray() {
+    if (playerCardsTestArray.length === 0) {
+      playerCardsTestArray = playerCards;
+    }
+    if (dealerCardsTestArray.length === 0) {
+      dealerCardsTestArray = dealerCards;
+    }
+  }
+
+  function updatePlayerBetAmountArray() {
+    if (betAmountTestArray.length === 0) {
+      betAmountTestArray = betAmountArray;
+    }
+  }
+
   function dealCard(targetArray) {
     const newCard = playingDeck[nextCardsIndex()];
     setPile([...pile, newCard]);
@@ -204,9 +254,8 @@ export default function Home() {
     let dealerBust = false;
     function drawCard() {
       if (sumFinalValues(updatedDealerCards) < 17) {
-        console.log(`deckIndex ${deckIndex}`);
-        console.log(`newDrawCardIndex ${newDrawCardIndex}`);
-        updatedDealerCards.push(playingDeck[newDrawCardIndex]);
+        updatedDealerCards = [...updatedDealerCards, playingDeck[newDrawCardIndex]];
+        dealerCardsTestArray = [...updatedDealerCards];
         setDealerCards([...updatedDealerCards]);
         setPile(prevPile => [...prevPile, playingDeck[newDrawCardIndex]]);
         newDrawCardIndex++;
@@ -243,7 +292,9 @@ export default function Home() {
   // -----------------------------------------------------
 
   function compareHands(handIndex, updatedDealerCards) {
-    let playerVal = sumFinalValues(playerCards[handIndex]);
+    updateCardsTestArray();
+    updatePlayerBetAmountArray();
+    let playerVal = sumFinalValues(playerCardsTestArray[handIndex]);
     let dealerVal = sumFinalValues(updatedDealerCards);
     if (playerVal > 21) {
       lose(handIndex);
@@ -265,18 +316,20 @@ export default function Home() {
   }
 
   function checkOutcome(dealerBust, updatedDealerCards) {
+    updateCardsTestArray();
+    updatePlayerBetAmountArray();
     if (dealerBust) {
-      for (let handIndex in playerCards) {
-        console.log(`${sumFinalValues(playerCards[handIndex])} || ${sumFinalValues(updatedDealerCards)}`);
-        if (didBust(playerCards[handIndex])) {
+      for (let handIndex in playerCardsTestArray) {
+        console.log(`${sumFinalValues(playerCardsTestArray[handIndex])} || ${sumFinalValues(updatedDealerCards)}`);
+        if (didBust(playerCardsTestArray[handIndex])) {
           lose(handIndex);
         } else {
           win(handIndex);
         }
       }
     } else {
-      for (let handIndex in playerCards) {
-        console.log(`${sumFinalValues(playerCards[handIndex])} || ${sumFinalValues(updatedDealerCards)}`);
+      for (let handIndex in playerCardsTestArray) {
+        console.log(`${sumFinalValues(playerCardsTestArray[handIndex])} || ${sumFinalValues(updatedDealerCards)}`);
         compareHands(handIndex, updatedDealerCards);
       }
     }
@@ -288,26 +341,32 @@ export default function Home() {
 
   function win(handIndex) {
     setWinCount(prevCount => prevCount + 1);
-    winnings += betAmount;
-    console.log(bank);
-    console.log(`bet ${betAmount}`);
+    winnings = betAmountTestArray.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+    console.log(`bet amt------`);
+    console.log(betAmountTestArray);
     console.log(`winnings ${winnings}`);
-    setBank(bank + winnings);
+    setBank(prevAmount => prevAmount + winnings);
     console.log(handIndex, 'win');
   }
 
   function lose(handIndex) {
+    setHiddenCard(false);
     setLoseCount(prevCount => prevCount + 1);
-    winnings -= betAmount;
-    console.log(bank);
-    console.log(`bet ${betAmount}`);
+    betAmountTestArray[handIndex] = betAmountTestArray[handIndex] * -1;
+    console.log(`bet amt------`);
+    console.log(betAmountTestArray);
+    winnings = betAmountTestArray.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
     console.log(`losses ${winnings}`);
-    setBank(bank + winnings);
+    setBank(prevAmount => prevAmount + winnings);
     console.log(handIndex, 'lose');
   }
 
   function push(handIndex) {
     setPushCount(prevCount => prevCount + 1);
+    betAmountTestArray[handIndex] = betAmountTestArray[handIndex] * 0;
+    console.log(`bet amt------`);
+    console.log(betAmountTestArray);
+    winnings = betAmountTestArray.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
     console.log(handIndex, 'push');
   }
 
@@ -365,7 +424,14 @@ export default function Home() {
       setDealerCards([...dealerCards, playingDeck[deckIndex]]);
     },
     printDealer: () => console.log(dealerCards),
-    printPlayer: () => console.log(playerCards),
+    printPlayer: () => {
+      console.log(`player cards`);
+      console.log(playerCards);
+      console.log(`dealer cards`);
+      console.log(dealerCards);
+      console.log(`bet array`);
+      console.log(betAmountArray);
+    },
     printDeck: () => console.log(playingDeck),
     printDeckCount: () => console.log(playingDeck.length),
     printPile: () => console.log(pile),
