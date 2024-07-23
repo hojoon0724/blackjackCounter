@@ -90,7 +90,6 @@ export default function Home() {
     let playersHand = [[]];
     let cardsToPile = [...pile];
 
-    // use dealCard function to deal
     for (let i = 0; i < 4; i = i + 2) {
       playersHand[0].push(playingDeck[deckIndex + i]);
       cardsToPile.push(playingDeck[deckIndex + i]);
@@ -115,11 +114,11 @@ export default function Home() {
       stand(currentHandIndex);
     }
 
-    // if (playersHand.length >= 2 && playersHand[0].value === playersHand[1].value) {
-    //   console.log(`same values ${playersHand[0].value} // ${playersHand[1].value}`);
-    //   disableSplitButton(false);
-    // }
-    disableSplitButton(false);
+    if (playersHand.length === 2 && playersHand[0].value === playersHand[1].value) {
+      console.log(`same values ${playersHand[0].value} // ${playersHand[1].value}`);
+      disableSplitButton(false);
+    }
+    // disableSplitButton(false);
   }
 
   function split(currentHandIndex) {
@@ -179,11 +178,12 @@ export default function Home() {
     }
     if (sumFinalValues(updatedPlayerCards[currentHandIndex]) > 21) {
       if (updatedPlayerCards.length <= 1) {
-        lose(currentHandIndex);
+        setTimeout(() => {
+          checkOutcome(false, dealerCards);
+        }, 750);
       } else {
         stand(currentHandIndex);
       }
-      // If 2+hand = stand, dealer plays
     }
   }
 
@@ -316,6 +316,7 @@ export default function Home() {
   }
 
   function checkOutcome(dealerBust, updatedDealerCards) {
+    setHiddenCard(false);
     updateCardsTestArray();
     updatePlayerBetAmountArray();
     if (dealerBust) {
@@ -350,7 +351,6 @@ export default function Home() {
   }
 
   function lose(handIndex) {
-    setHiddenCard(false);
     setLoseCount(prevCount => prevCount + 1);
     betAmountTestArray[handIndex] = betAmountTestArray[handIndex] * -1;
     console.log(`bet amt------`);
