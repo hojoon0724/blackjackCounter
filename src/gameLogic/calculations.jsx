@@ -53,8 +53,7 @@ export function sumFinalValues(cardArray) {
   const rawVal = cardArray.reduce((n, { value }) => n + value, 0);
   if (cardArray.length === 2 && rawVal === 11 && aceExists) {
     return 21;
-  }
-  if (aceExists && rawVal + 10 < 22) {
+  } else if (aceExists && rawVal + 10 < 22) {
     return rawVal + 10;
   } else {
     return rawVal;

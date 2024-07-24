@@ -106,7 +106,7 @@ export default function Home() {
     disableHitButton(false);
     disableStandButton(false);
     disableSurrenderButton(false);
-    playerCardsTestArray = [playersHand];
+    playerCardsTestArray = playersHand;
     dealerCardsTestArray = dealersHand;
 
     if (sumFinalValues(playersHand[0]) === 21) {
@@ -202,7 +202,7 @@ export default function Home() {
   }
 
   function stand(currentHandIndex) {
-    if (playerCards.length - 1 > currentHandIndex) {
+    if (currentHandIndex < playerCards.length - 1) {
       setCurrentHandIndex(currentHandIndex + 1);
       hit(currentHandIndex + 1);
       disableDoubleButton(false);
@@ -333,6 +333,8 @@ export default function Home() {
     setHiddenCard(false);
     updateCardsTestArray();
     updatePlayerBetAmountArray();
+    console.log(`check outcome test arr`);
+    console.log(playerCardsTestArray);
     if (dealerBust) {
       for (let handIndex in playerCardsTestArray) {
         console.log(`${sumFinalValues(playerCardsTestArray[handIndex])} || ${sumFinalValues(updatedDealerCards)}`);
