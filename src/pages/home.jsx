@@ -113,9 +113,8 @@ export default function Home() {
       betAmountTestArray[0] = betAmount * 1.5;
       stand(currentHandIndex);
     }
-
-    if (playersHand.length === 2 && playersHand[0].value === playersHand[1].value) {
-      console.log(`same values ${playersHand[0].value} // ${playersHand[1].value}`);
+    if (playersHand[0][0].value === playersHand[0][1].value) {
+      console.log(`same values ${playersHand[0][0].value} // ${playersHand[0][1].value}`);
       disableSplitButton(false);
     }
     // disableSplitButton(false);
@@ -164,18 +163,33 @@ export default function Home() {
     } else {
       updatedPlayerCards = [...playerCardsTestArray];
     }
+
     updatedPlayerCards[currentHandIndex] = dealCard(playerCards[currentHandIndex]);
-    if (updatedPlayerCards.length >= 2) {
+
+    if (updatedPlayerCards[currentHandIndex].length > 2) {
       disableDoubleButton(false);
     } else {
       disableDoubleButton(true);
     }
+
     playerCardsTestArray = updatedPlayerCards;
     setPlayerCards(updatedPlayerCards);
+
+    console.log(`currentHandIndex ${currentHandIndex}`);
+    console.log(updatedPlayerCards);
+
+    if (
+      updatedPlayerCards[currentHandIndex].length === 2 &&
+      updatedPlayerCards[currentHandIndex][0].value === updatedPlayerCards[currentHandIndex][1].value
+    ) {
+      console.log(`split possible`);
+      disableSplitButton(false);
+    }
 
     if (sumFinalValues(updatedPlayerCards[currentHandIndex]) === 21) {
       stand(currentHandIndex);
     }
+
     if (sumFinalValues(updatedPlayerCards[currentHandIndex]) > 21) {
       if (updatedPlayerCards.length <= 1) {
         setTimeout(() => {
@@ -292,7 +306,7 @@ export default function Home() {
   // -----------------------------------------------------
 
   function compareHands(handIndex, updatedDealerCards) {
-    updateCardsTestArray();
+    // updateCardsTestArray();
     updatePlayerBetAmountArray();
     let playerVal = sumFinalValues(playerCardsTestArray[handIndex]);
     let dealerVal = sumFinalValues(updatedDealerCards);
@@ -330,6 +344,8 @@ export default function Home() {
       }
     } else {
       for (let handIndex in playerCardsTestArray) {
+        console.log(`handIndex ${handIndex}`);
+        console.log(playerCardsTestArray);
         console.log(`${sumFinalValues(playerCardsTestArray[handIndex])} || ${sumFinalValues(updatedDealerCards)}`);
         compareHands(handIndex, updatedDealerCards);
       }
@@ -431,6 +447,7 @@ export default function Home() {
       console.log(dealerCards);
       console.log(`bet array`);
       console.log(betAmountArray);
+      console.log(`${sumFinalValues(playerCards[0])} || ${sumFinalValues(dealerCards)}`);
     },
     printDeck: () => console.log(playingDeck),
     printDeckCount: () => console.log(playingDeck.length),
