@@ -92,7 +92,7 @@
 .player-card-value,
 .player-hand-bet-amount {
   position: absolute;
-  width: calc(var(--card-width) + 1.5svh);
+  width: calc(var(--card-width) + 1.5vh);
   /* height: calc(var(--card-height)); */
   /* left: -4ch; */
   display: flex;
