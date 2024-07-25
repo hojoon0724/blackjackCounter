@@ -10,7 +10,7 @@ import {
   dealerShowingTen,
   sumMitCount,
 } from '../gameLogic/mathFunctions';
-import { aceExists, canSplit, getRandomInRange } from '../gameLogic/helperFunctions';
+import { canSplit, getRandomInRange, getHandsSumRaw } from '../gameLogic/helperFunctions';
 
 // UI Components
 import TopBar from '../components/ui/topBar';
@@ -337,20 +337,20 @@ export default function Home() {
   function dealerPlay() {
     updateLiveData();
     let dealerBust = false;
-    let soft17 = aceExists(liveDealerCards) ? true : false;
+    // let soft17 = aceExists(liveDealerCards) ? true : false;
 
     function drawCard() {
-      if (getHandsSumInt(liveDealerCards) < 17) {
+      if (getHandsSumRaw(liveDealerCards) < 17) {
         liveDealerCards = dealCard(liveDealerCards);
         setTimeout(drawCard, 1000);
-      } else if (getHandsSumInt(liveDealerCards) === 17 && soft17) {
-        liveDealerCards = dealCard(liveDealerCards);
-        soft17 = false;
-        setTimeout(drawCard, 1000);
-      } else if (getHandsSumInt(liveDealerCards) > 21) {
-        dealerBust = true;
+        // } else if (getHandsSumRaw(liveDealerCards) === 17 && soft17) {
+        //   liveDealerCards = dealCard(liveDealerCards);
+        // soft17 = false;
+        // setTimeout(drawCard, 1000);
+      } else if (getHandsSumRaw(liveDealerCards) >= 17) {
         checkOutcome(dealerBust);
-      } else if (getHandsSumInt(liveDealerCards) >= 17) {
+      } else if (getHandsSumRaw(liveDealerCards) > 21) {
+        dealerBust = true;
         checkOutcome(dealerBust);
       }
       setData();
