@@ -10,13 +10,13 @@ import {
   dealerShowingTen,
   sumMitCount,
 } from '../gameLogic/mathFunctions';
+import { aceExists, canSplit, getRandomInRange } from '../gameLogic/helperFunctions';
 
 // UI Components
 import TopBar from '../components/ui/topBar';
 import BottomBar from '../components/ui/bottomBar';
 import PlayArea from '../components/playArea/playArea';
 import PlayerStats from '../components/ui/playerStats';
-import { aceExists, canSplit, getRandomInRange } from '../gameLogic/helperFunctions';
 
 export const GameContext = createContext();
 
@@ -55,6 +55,7 @@ export default function Home() {
   const [insuranceBet, setInsuranceBet] = useState(betAmount / 2);
   // const maxInsurance = betAmount / 2;
   const [winningsArray, setWinningsArray] = useState([betAmount]);
+  const [handOutcomes, setHandOutcomes] = useState([]);
 
   const hasInitialized = useRef(false);
   const mitCount = sumMitCount(pile);
@@ -65,6 +66,7 @@ export default function Home() {
   let liveDealerCards = [];
   let livePlayerCards = [];
   let liveWinningsArray = [];
+  let liveHandOutcomes = [];
 
   useEffect(() => {
     if (!hasInitialized.current) {
@@ -91,6 +93,7 @@ export default function Home() {
     startNewGame();
 
     liveWinningsArray = [betAmount];
+    liveHandOutcomes = ['In Play'];
 
     for (let i = 0; i < 2; i++) {
       livePlayerCards[0] = dealCard(livePlayerCards[0]);
@@ -105,11 +108,12 @@ export default function Home() {
     disableStandButton(false);
     disableSurrenderButton(false);
     if (livePlayerCards[0][0].value === livePlayerCards[0][1].value) {
-      disableSplitButton(false);
     }
+    disableSplitButton(false);
 
     if (isBlackjack(livePlayerCards[0])) {
       liveWinningsArray[0] *= 1.5;
+      liveHandOutcomes[0] = ['Blackjack'];
       setTimeout(() => {
         stand(currentHandIndex);
       }, 1000);
@@ -134,7 +138,9 @@ export default function Home() {
     updateLiveData();
     disableSurrenderButton(true);
 
-    liveWinningsArray = [...liveWinningsArray, betAmount];
+    // const additionalBet = addBet();
+    liveWinningsArray = [...liveWinningsArray, addBet()];
+    liveHandOutcomes = [...liveHandOutcomes, 'Split'];
 
     let newHand = [livePlayerCards[currentHandIndex][1]];
     livePlayerCards = [...livePlayerCards, newHand];
@@ -153,6 +159,7 @@ export default function Home() {
       livePlayerCards[currentHandIndex] = dealCard(livePlayerCards[currentHandIndex]);
 
       if (isBlackjack(livePlayerCards[currentHandIndex])) {
+        liveHandOutcomes[currentHandIndex] = 'Blackjack';
         stand(currentHandIndex);
       }
     }
@@ -162,7 +169,8 @@ export default function Home() {
 
   function double(currentHandIndex) {
     updateLiveData();
-    liveWinningsArray[currentHandIndex] *= 2;
+
+    liveWinningsArray[currentHandIndex] += addBet();
 
     livePlayerCards[currentHandIndex] = dealCard(livePlayerCards[currentHandIndex]);
     stand(currentHandIndex);
@@ -175,6 +183,7 @@ export default function Home() {
     updateLiveData();
 
     livePlayerCards[currentHandIndex] = dealCard(livePlayerCards[currentHandIndex]);
+    liveHandOutcomes[currentHandIndex] = ['In Play'];
 
     if (livePlayerCards[currentHandIndex].length > 2) {
       disableDoubleButton(true);
@@ -205,6 +214,7 @@ export default function Home() {
 
   function stand(currentHandIndex) {
     updateLiveData();
+    liveHandOutcomes[currentHandIndex] = 'Stand';
 
     if (currentHandIndex < livePlayerCards.length - 1) {
       setCurrentHandIndex(currentHandIndex + 1);
@@ -252,6 +262,11 @@ export default function Home() {
     }
   }
 
+  function addBet() {
+    setBank(prevAmt => prevAmt - betAmount);
+    return betAmount;
+  }
+
   // -----------------------------------------------------
   // - Processing Logic
   // -----------------------------------------------------
@@ -292,6 +307,9 @@ export default function Home() {
     if (liveWinningsArray.length === 0) {
       liveWinningsArray = winningsArray;
     }
+    if (liveHandOutcomes.length === 0) {
+      liveHandOutcomes = handOutcomes;
+    }
   }
 
   function setData() {
@@ -303,6 +321,9 @@ export default function Home() {
     }
     if (liveWinningsArray.length !== 0) {
       setWinningsArray(liveWinningsArray);
+    }
+    if (liveHandOutcomes.length !== 0) {
+      setHandOutcomes(liveHandOutcomes);
     }
   }
 
@@ -329,7 +350,7 @@ export default function Home() {
       } else if (getHandsSumInt(liveDealerCards) > 21) {
         dealerBust = true;
         checkOutcome(dealerBust);
-      } else if (getHandsSumInt(liveDealerCards) > 17) {
+      } else if (getHandsSumInt(liveDealerCards) >= 17) {
         checkOutcome(dealerBust);
       }
       setData();
@@ -405,21 +426,24 @@ export default function Home() {
   function win(handIndex) {
     updateLiveData();
     setWinCount(prevCount => prevCount + 1);
-    liveWinningsArray[handIndex] = liveWinningsArray[handIndex] * 1;
+    liveWinningsArray[handIndex] = liveWinningsArray[handIndex] * 2;
+    liveHandOutcomes[handIndex] = 'Win';
     setData();
   }
 
   function lose(handIndex) {
     updateLiveData();
     setLoseCount(prevCount => prevCount + 1);
-    liveWinningsArray[handIndex] = liveWinningsArray[handIndex] * -1;
+    liveWinningsArray[handIndex] = liveWinningsArray[handIndex] * 0;
+    liveHandOutcomes[handIndex] = 'Lost';
     setData();
   }
 
   function push(handIndex) {
     updateLiveData();
     setPushCount(prevCount => prevCount + 1);
-    liveWinningsArray[handIndex] = liveWinningsArray[handIndex] * 0;
+    liveWinningsArray[handIndex] = liveWinningsArray[handIndex] * 1;
+    liveHandOutcomes[handIndex] = 'Push';
     setData();
   }
 
@@ -504,13 +528,20 @@ export default function Home() {
     },
 
     printStates: () => {
-      console.log(playingDeck);
-      console.log(`deckIndex = ${deckIndex}`);
-      console.log(pile);
+      console.log(`winningsArray`);
+      console.log(winningsArray);
+      console.log(`insuranceBet`);
       console.log(insuranceBet);
-      console.log(bank);
-      // console.log(`winnings = ${winnings}`);
-      // console.log(`betAmount = ${betAmount}`);
+    },
+
+    printMoney: () => {
+      console.log('----------');
+      console.log(`bank: ${bank}`);
+      console.log(`betAmount: ${betAmount}`);
+      console.log(`winningsArray`);
+      console.log(winningsArray);
+      console.log(`insuranceBet ${insuranceBet}`);
+      console.log('----------');
     },
 
     printAce: () => console.log(getHandsSumString(playerCards[0])),
@@ -555,6 +586,8 @@ export default function Home() {
         setBetAmount,
         insuranceBet,
         setInsuranceBet,
+        winningsArray,
+        handOutcomes,
 
         mitCount,
 

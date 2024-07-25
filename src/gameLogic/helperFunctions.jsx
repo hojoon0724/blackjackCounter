@@ -20,7 +20,7 @@ export function getHandsSumRaw(handArray) {
 }
 
 export function canSplit(handArray) {
-  if (handArray[0].vaue === handArray[1].vaue && thereAreTwoCards(handArray)) {
+  if (handArray[0].value === handArray[1].value && thereAreTwoCards(handArray)) {
     return true;
   } else {
     return false;
