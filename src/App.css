@@ -7,6 +7,15 @@ div {
   box-sizing: border-box;
 }
 
+.small-button {
+  font-size: 0.8rem;
+  padding: 1ch 2ch;
+  border-radius: 2ch;
+  border: 0px;
+  background-color: white;
+  color: black;
+}
+
 .top {
   background-color: #0b280b;
   height: 100svh;

@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { sumFinalValues } from '../../gameLogic/calculations';
+import { getHandsSumInt } from '../../gameLogic/mathFunctions';
 import { useState, useEffect, useContext } from 'react';
 import { GameContext } from '../../pages/home';
 
@@ -17,7 +17,7 @@ export default function DealerCardsContainer() {
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      setCardValSum(sumFinalValues(dealerCards));
+      setCardValSum(getHandsSumInt(dealerCards));
     }, 750);
     return () => clearTimeout(timeoutId);
   }, [hiddenCard, dealerCards]);

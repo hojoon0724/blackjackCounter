@@ -1,9 +1,9 @@
 [
-  { name: '03-07-3', value: 7, mitCountValue: 0, cardSvg: '/assets/SVGs/03-07.svg', deckNum: '3' },
   { name: '04-10-1', value: 10, mitCountValue: -1, cardSvg: '/assets/SVGs/04-10.svg', deckNum: '1' },
+  { name: '03-07-3', value: 7, mitCountValue: 0, cardSvg: '/assets/SVGs/03-07.svg', deckNum: '3' },
+  { name: '04-01-2', value: 1, mitCountValue: -1, cardSvg: '/assets/SVGs/04-01.svg', deckNum: '2' },
   { name: '01-10-4', value: 10, mitCountValue: -1, cardSvg: '/assets/SVGs/01-10.svg', deckNum: '4' },
   { name: '02-05-3', value: 5, mitCountValue: 1, cardSvg: '/assets/SVGs/02-05.svg', deckNum: '3' },
-  { name: '04-01-2', value: 1, mitCountValue: -1, cardSvg: '/assets/SVGs/04-01.svg', deckNum: '2' },
   { name: '04-08-2', value: 8, mitCountValue: 0, cardSvg: '/assets/SVGs/04-08.svg', deckNum: '2' },
   { name: '02-13K-5', value: 10, mitCountValue: -1, cardSvg: '/assets/SVGs/02-13K.svg', deckNum: '5' },
   { name: '04-13K-4', value: 10, mitCountValue: -1, cardSvg: '/assets/SVGs/04-13K.svg', deckNum: '4' },

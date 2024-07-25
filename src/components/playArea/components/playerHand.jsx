@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect, useContext } from 'react';
-import { sumWithAce } from '../../../gameLogic/calculations';
+import { getHandsSumString } from '../../../gameLogic/mathFunctions';
 import Card from './card';
 import { GameContext } from '../../../pages/home';
 
@@ -9,7 +9,7 @@ export default function PlayerHand({ hand, handIndex }) {
   const { currentHandIndex } = useContext(GameContext);
 
   useEffect(() => {
-    let newHandValSum = sumWithAce(hand);
+    let newHandValSum = getHandsSumString(hand);
     const timeoutId = setTimeout(() => {
       setHandValSum(newHandValSum);
     }, 500);

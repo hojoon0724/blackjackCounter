@@ -10,26 +10,30 @@ let USDollar = new Intl.NumberFormat('en-US', {
 });
 
 export default function PlayerStats() {
-  const { gameCount, winCount, pushCount, loseCount, bank } = useContext(GameContext);
+  const { gameCount, winCount, pushCount, loseCount, mitCount, bank } = useContext(GameContext);
 
   return (
     <div className="player-stats-container flex-row">
       <div className="player-stats flex-column">
-        <div className="game-count-container flex-row">
-          <div className="game-count-label">Game:</div>
-          <div className="game-count-amount">{gameCount}</div>
+        <div className="stat-row flex-row">
+          <div className="stat-label">Games:</div>
+          <div className="stat-value">{gameCount}</div>
         </div>
-        <div className="win-count-container flex-row">
-          <div className="win-count-label">Wins:</div>
-          <div className="win-count-amount">{winCount}</div>
+        <div className="stat-row flex-row">
+          <div className="stat-label">Wins:</div>
+          <div className="stat-value">{winCount}</div>
         </div>
-        <div className="push-count-container flex-row">
-          <div className="push-count-label">Push:</div>
-          <div className="push-count-amount">{pushCount}</div>
+        <div className="stat-row flex-row">
+          <div className="stat-label">Pushes:</div>
+          <div className="stat-value">{pushCount}</div>
         </div>
-        <div className="lose-count-container flex-row">
-          <div className="lose-count-label">Loss:</div>
-          <div className="lose-count-amount">{loseCount}</div>
+        <div className="stat-row flex-row">
+          <div className="stat-label">Losses:</div>
+          <div className="stat-value">{loseCount}</div>
+        </div>
+        <div className="stat-row flex-row">
+          <div className="stat-label">Count: </div>
+          <div className="stat-value hidden-value">{mitCount}</div>
         </div>
       </div>
       <div className="player-bank">

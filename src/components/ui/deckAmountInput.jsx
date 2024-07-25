@@ -9,7 +9,6 @@ export default function DeckAmountInput() {
     <>
       <div className="setting-name">Deck Amount</div>
       <div className="deck-amount-input-container flex-row align-center">
-        {/* <div className="deck-amount-label">Deck amount: </div> */}
         <div className="deck-amount-minus-button" onClick={() => setDeckAmount(prev => Math.max(1, prev - 1))}>
           -
         </div>

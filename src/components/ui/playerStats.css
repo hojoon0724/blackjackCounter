@@ -10,26 +10,30 @@
   bottom: 0;
   padding: 10px;
 }
-.game-count-container,
-.win-count-container,
-.push-count-container,
-.lose-count-container {
+
+.stat-row {
   padding-top: 6px;
   min-width: 10ch;
   justify-content: space-between;
 }
-.game-count-label,
-.win-count-label,
-.push-count-label,
-.lose-count-label {
+
+.stat-value {
+  text-align: right;
 }
 
-.game-count-amount,
-.win-count-amount,
-.push-count-amount,
-.lose-count-amount {
-  min-width: 2ch;
+.hidden-value {
+  color: rgba(255, 255, 255, 1);
+  transition: 0.3s ease-in-out;
+  margin-left: 1ch;
+  background-color: rgba(255, 255, 255, 0);
+  min-width: 3ch;
 }
+
+.hidden-value:hover {
+  color: rgba(255, 255, 255, 1);
+  background-color: rgba(255, 255, 255, 0);
+}
+
 .player-bank {
   padding: 8px;
   position: absolute;
