@@ -10,14 +10,14 @@ let USDollar = new Intl.NumberFormat('en-US', {
 });
 
 export default function PlayerCardsContainer() {
-  const { playerCards, betAmount, setBetAmount, setBank } = useContext(GameContext);
+  const { playerCards, betAmount, setBetAmount, setBank, winningsArray } = useContext(GameContext);
 
   return (
     <div className="player-container">
-      <div className="player-hand flex-row">
+      <div className="player-hand flex-row justify-center">
         {playerCards.map((hand, handIndex) => (
           <div className="player-cards-container" id={handIndex} key={handIndex}>
-            <PlayerHand hand={hand} handIndex={handIndex} />
+            <PlayerHand hand={hand} handIndex={handIndex} handBet={winningsArray[handIndex]} />
           </div>
         ))}
       </div>
