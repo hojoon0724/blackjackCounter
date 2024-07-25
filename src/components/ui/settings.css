@@ -18,7 +18,7 @@
 
 .setting-row {
   width: 80%;
-  margin: 0 auto;
+  margin: 0 auto 2ch auto;
   column-gap: 3ch;
 }
 .setting-row > * {
@@ -29,5 +29,5 @@
 }
 
 .close-settings-modal {
-  margin-top: 2rem;
+  margin-top: 2ch;
 }

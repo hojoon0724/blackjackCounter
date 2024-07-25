@@ -8,8 +8,8 @@
 }
 
 .bottom-bar {
-  width: 100%;
-  min-height: 16px;
+  width: 100vw;
+  min-height: 3rem;
   background-color: rgba(0, 0, 0, 0.4);
   padding: 10px;
   box-sizing: border-box;
@@ -17,28 +17,8 @@
   justify-content: space-between;
 }
 
-.mit-count-container,
-.deal-button-container {
-  min-width: 10ch;
-}
-
 .money-value {
   margin-left: 1ch;
-}
-
-.mit-count-container > .mit-count-value {
-  min-width: 3ch;
-  text-align: right;
-  color: rgba(255, 255, 255, var(--transparent));
-  transition: 0.3s ease-in-out;
-  margin-left: 1ch;
-  background-color: var(--highlight);
-}
-
-.mit-count-container:hover > .mit-count-value {
-  color: rgba(255, 255, 255, 1);
-  background-color: rgba(255, 255, 255, 0);
-  opacity: 1;
 }
 
 .shuffle-container {
@@ -57,47 +37,91 @@
 
 .action-button,
 .deal-button {
-  font-size: 1rem;
-  min-width: 11ch;
-  padding: 8px;
+  font-size: clamp(12px, 2svw, 1rem);
+  min-width: 10ch;
+  max-width: calc(100svw / 6);
+  padding: 6px 12px;
   border-radius: 2em;
   background-color: #e8e8e8;
   color: #000000;
   border: none;
+  text-transform: capitalize;
 }
 
 .action-button:disabled,
 button[disabled] {
-  font-size: 1rem;
-  min-width: 11ch;
-  padding: 8px;
-  border-radius: 2em;
-  background-color: #e8e8e8;
-  color: #000000;
-  border: none;
-
   opacity: 0.3;
 }
 
 .action-button {
-  margin: 0px 8px;
-}
-
-.deal-button-container {
-  /* justify-content: flex-end; */
-}
-
-.action-split {
-}
-.action-double {
-}
-.action-hit {
-}
-.action-stand {
-}
-.action-surrender {
+  margin: 0px 6px;
 }
 
 .shuffle-container {
   z-index: 1;
+}
+
+.deal-actions {
+  column-gap: 2ch;
+}
+
+.betting-bar-container {
+  background-color: rgba(0, 0, 0, 0.4);
+  box-sizing: border-box;
+  position: relative;
+  justify-content: flex-end;
+  margin: 0 2ch;
+}
+
+.betting-chip {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 0.5ch;
+  width: 4ch;
+  height: 4ch;
+  border-radius: 4ch;
+  font-size: 0.75rem;
+  font-weight: bold;
+  letter-spacing: -0.2ch;
+  outline: dashed 2px black;
+  outline-offset: -3px;
+  cursor: pointer;
+}
+
+.bet-1 {
+  background-color: #e8e8e8;
+  color: black;
+}
+.bet-5 {
+  background-color: #ff3a3a;
+  color: black;
+}
+.bet-10 {
+  background-color: #fc8814;
+  color: black;
+}
+.bet-25 {
+  background-color: #1e6f00;
+  color: white;
+  outline-color: white;
+}
+.bet-50 {
+  background-color: #000d9f;
+  color: white;
+  outline-color: white;
+}
+.bet-100 {
+  background-color: #4a4a4a;
+  color: white;
+  outline-color: white;
+}
+.bet-500 {
+  background-color: #6d00e2;
+  color: white;
+  outline-color: white;
+}
+.bet-1000 {
+  background-color: #ffe62b;
+  color: black;
 }

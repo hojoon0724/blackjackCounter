@@ -1,14 +1,12 @@
 import './bottomBar.css';
-import GameActionButtons from './gameActionButtons';
-import MitCount from './mitCount';
-import ShuffleButton from './shuffleButton';
+import BottomBarActionsContainer from './bottomBarActionsContainer';
 
 export default function BottomBar() {
   return (
-    <div className="bottom-bar flex-row">
-      <MitCount />
-      <GameActionButtons />
-      <ShuffleButton />
+    <div className="bottom-bar-container">
+      <div className="bottom-bar flex-row">
+        <BottomBarActionsContainer />
+      </div>
     </div>
   );
 }

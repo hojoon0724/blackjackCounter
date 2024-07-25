@@ -1,10 +1,22 @@
 import { useState, useEffect, useRef, createContext } from 'react';
+
+// Process functions
+import { getNewDeck } from '../gameLogic/deckAssembly';
+import {
+  getHandsSumInt,
+  getHandsSumString,
+  isBlackjack,
+  dealerShowingAce,
+  dealerShowingTen,
+  sumMitCount,
+} from '../gameLogic/mathFunctions';
+
+// UI Components
 import TopBar from '../components/ui/topBar';
 import BottomBar from '../components/ui/bottomBar';
 import PlayArea from '../components/playArea/playArea';
-
-import { cardDeckAssembly, shuffleDeck, sumFinalValues, sumMitCount, sumWithAce } from '../gameLogic/calculations';
 import PlayerStats from '../components/ui/playerStats';
+import { aceExists, canSplit, getRandomInRange } from '../gameLogic/helperFunctions';
 
 export const GameContext = createContext();
 
@@ -14,13 +26,13 @@ export default function Home() {
 
   const [deckIndex, setDeckIndex] = useState(0);
   const [cutIndex, setCutIndex] = useState(deckAmount * 48);
-  const [needsShuffle, setNeedsShuffle] = useState(false);
-  const [isShuffled, setIsShuffled] = useState(true);
 
   const [gameInProgress, setGameInProgress] = useState(false);
+  const [askInsurance, setAskInsurance] = useState(false);
+
   const [dealerCards, setDealerCards] = useState([]);
   const [hiddenCard, setHiddenCard] = useState(true);
-  const [playerCards, setPlayerCards] = useState([[]]);
+  const [playerCards, setPlayerCards] = useState([]);
   const [currentHandIndex, setCurrentHandIndex] = useState(0);
 
   const [splitButton, disableSplitButton] = useState(true);
@@ -39,37 +51,35 @@ export default function Home() {
   const [loseCount, setLoseCount] = useState(0);
 
   const [bank, setBank] = useState(10000);
-  const [betAmount, setBetAmount] = useState(10);
-  const [betAmountArray, setBetAmountArray] = useState([betAmount]);
+  const [betAmount, setBetAmount] = useState(0);
+  const [insuranceBet, setInsuranceBet] = useState(betAmount / 2);
+  // const maxInsurance = betAmount / 2;
+  const [winningsArray, setWinningsArray] = useState([betAmount]);
 
   const hasInitialized = useRef(false);
   const mitCount = sumMitCount(pile);
+
   let winnings = 0;
 
   let cardIndexModifier = -1;
-  let dealerCardsTestArray = [];
-  let playerCardsTestArray = [];
-  let betAmountTestArray = [];
+  let liveDealerCards = [];
+  let livePlayerCards = [];
+  let liveWinningsArray = [];
 
   useEffect(() => {
     if (!hasInitialized.current) {
-      function initializeDeck() {
-        let cardDeck = cardDeckAssembly(deckAmount);
-        let shuffledDeck = shuffleDeck(cardDeck);
-        setPlayingDeck(shuffledDeck);
-      }
-
-      initializeDeck();
+      createNewTable(deckAmount);
       hasInitialized.current = true;
     }
   }, [deckAmount]);
 
-  function shuffleDecks() {
-    let cardDeck = cardDeckAssembly(deckAmount);
-    let shuffledDeck = shuffleDeck(cardDeck);
-    setPlayingDeck(shuffledDeck);
-    setIsShuffled(true);
-    setNeedsShuffle(false);
+  useEffect(() => {
+    setBank(prevAmt => prevAmt - betAmount);
+  }, [betAmount]);
+
+  function createNewTable(deckAmount) {
+    let newDeck = getNewDeck(deckAmount);
+    setPlayingDeck(newDeck);
     setGameInProgress(false);
   }
 
@@ -78,131 +88,125 @@ export default function Home() {
   // -----------------------------------------------------
 
   function deal() {
-    if (needsShuffle === true) {
-      setIsShuffled(false);
+    startNewGame();
+
+    liveWinningsArray = [betAmount];
+
+    for (let i = 0; i < 2; i++) {
+      livePlayerCards[0] = dealCard(livePlayerCards[0]);
+      liveDealerCards = dealCard(liveDealerCards);
     }
 
-    setCurrentHandIndex(0);
-    setBetAmountArray([betAmount]);
-    setGameInProgress(true);
-    setHiddenCard(true);
-    let dealersHand = [];
-    let playersHand = [[]];
-    let cardsToPile = [...pile];
-
-    for (let i = 0; i < 4; i = i + 2) {
-      playersHand[0].push(playingDeck[deckIndex + i]);
-      cardsToPile.push(playingDeck[deckIndex + i]);
-      dealersHand.push(playingDeck[deckIndex + i + 1]);
-      cardsToPile.push(playingDeck[deckIndex + i + 1]);
-    }
-
-    setPlayerCards(playersHand);
-    setDealerCards(dealersHand);
-    setPile(cardsToPile);
-    setDeckIndex(deckIndex + 4);
+    setPlayerCards(livePlayerCards);
+    setDealerCards(liveDealerCards);
 
     disableDoubleButton(false);
     disableHitButton(false);
     disableStandButton(false);
     disableSurrenderButton(false);
-    playerCardsTestArray = playersHand;
-    dealerCardsTestArray = dealersHand;
-
-    if (sumFinalValues(playersHand[0]) === 21) {
-      betAmountTestArray[0] = betAmount * 1.5;
-      stand(currentHandIndex);
-    }
-    if (playersHand[0][0].value === playersHand[0][1].value) {
-      console.log(`same values ${playersHand[0][0].value} // ${playersHand[0][1].value}`);
+    if (livePlayerCards[0][0].value === livePlayerCards[0][1].value) {
       disableSplitButton(false);
     }
-    // disableSplitButton(false);
+
+    if (isBlackjack(livePlayerCards[0])) {
+      liveWinningsArray[0] *= 1.5;
+      setTimeout(() => {
+        stand(currentHandIndex);
+      }, 1000);
+    } else {
+      if (dealerShowingAce(liveDealerCards)) {
+        setAskInsurance(true);
+      }
+
+      if (dealerShowingTen(liveDealerCards)) {
+        setTimeout(() => {
+          if (isBlackjack(liveDealerCards)) {
+            checkOutcome(currentHandIndex);
+          }
+        }, 1500);
+      }
+    }
+
+    setData();
   }
 
   function split(currentHandIndex) {
+    updateLiveData();
     disableSurrenderButton(true);
-    if (playerCards[0][0].value === 1 && playerCards[0][1].value === 1) {
-      console.log('split aces');
+
+    liveWinningsArray = [...liveWinningsArray, betAmount];
+
+    let newHand = [livePlayerCards[currentHandIndex][1]];
+    livePlayerCards = [...livePlayerCards, newHand];
+    livePlayerCards[currentHandIndex].pop();
+    if (livePlayerCards[0][0].value === 1 && livePlayerCards[1][0].value === 1) {
+      setTimeout(() => {
+        livePlayerCards[currentHandIndex] = dealCard(livePlayerCards[currentHandIndex]);
+      }, 250);
+      setTimeout(() => {
+        livePlayerCards[currentHandIndex + 1] = dealCard(livePlayerCards[currentHandIndex + 1]);
+      }, 500);
+      setTimeout(() => {
+        checkOutcome(currentHandIndex);
+      }, 2000);
+    } else {
+      livePlayerCards[currentHandIndex] = dealCard(livePlayerCards[currentHandIndex]);
+
+      if (isBlackjack(livePlayerCards[currentHandIndex])) {
+        stand(currentHandIndex);
+      }
     }
 
-    let updatedPlayerCards = [...playerCards];
-    let newHandArray = [updatedPlayerCards[currentHandIndex][1]];
-    updatedPlayerCards[currentHandIndex].pop();
-    updatedPlayerCards = [...updatedPlayerCards, newHandArray];
-    let updatedBetAmountArray = [...betAmountArray, betAmount];
-    setBetAmountArray(updatedBetAmountArray);
-
-    updatedPlayerCards[currentHandIndex] = dealCard(updatedPlayerCards[currentHandIndex]);
-    if (sumFinalValues(newHandArray) === 21) {
-      stand(currentHandIndex);
-    }
-    setPlayerCards(updatedPlayerCards);
+    setData();
   }
 
   function double(currentHandIndex) {
-    let updatedBetAmountArray = [...betAmountArray];
-    updatedBetAmountArray[currentHandIndex] = updatedBetAmountArray[currentHandIndex] * 2;
-    betAmountTestArray = updatedBetAmountArray;
-    setBetAmountArray(updatedBetAmountArray);
+    updateLiveData();
+    liveWinningsArray[currentHandIndex] *= 2;
 
-    let updatedPlayerCards = [...playerCards];
-    updatedPlayerCards[currentHandIndex] = dealCard(playerCards[currentHandIndex]);
-    playerCardsTestArray = updatedPlayerCards;
-    setPlayerCards(updatedPlayerCards);
+    livePlayerCards[currentHandIndex] = dealCard(livePlayerCards[currentHandIndex]);
     stand(currentHandIndex);
+
+    setData();
   }
 
   function hit(currentHandIndex) {
     disableSurrenderButton(true);
-    disableSplitButton(true);
+    updateLiveData();
 
-    let updatedPlayerCards = [];
-    if (playerCardsTestArray.length === 0) {
-      updatedPlayerCards = [...playerCards];
-    } else {
-      updatedPlayerCards = [...playerCardsTestArray];
-    }
+    livePlayerCards[currentHandIndex] = dealCard(livePlayerCards[currentHandIndex]);
 
-    updatedPlayerCards[currentHandIndex] = dealCard(playerCards[currentHandIndex]);
-
-    if (updatedPlayerCards[currentHandIndex].length > 2) {
-      disableDoubleButton(false);
-    } else {
+    if (livePlayerCards[currentHandIndex].length > 2) {
       disableDoubleButton(true);
+    } else {
+      disableDoubleButton(false);
     }
 
-    playerCardsTestArray = updatedPlayerCards;
-    setPlayerCards(updatedPlayerCards);
-
-    console.log(`currentHandIndex ${currentHandIndex}`);
-    console.log(updatedPlayerCards);
-
-    if (
-      updatedPlayerCards[currentHandIndex].length === 2 &&
-      updatedPlayerCards[currentHandIndex][0].value === updatedPlayerCards[currentHandIndex][1].value
-    ) {
-      console.log(`split possible`);
-      disableSplitButton(false);
+    if (!canSplit(livePlayerCards[currentHandIndex])) {
+      disableSplitButton(true);
     }
 
-    if (sumFinalValues(updatedPlayerCards[currentHandIndex]) === 21) {
+    if (getHandsSumInt(livePlayerCards[currentHandIndex]) === 21) {
       stand(currentHandIndex);
     }
 
-    if (sumFinalValues(updatedPlayerCards[currentHandIndex]) > 21) {
-      if (updatedPlayerCards.length <= 1) {
+    if (getHandsSumInt(livePlayerCards[currentHandIndex]) > 21) {
+      if (livePlayerCards.length === 1) {
         setTimeout(() => {
-          checkOutcome(false, dealerCards);
+          checkOutcome(false);
         }, 750);
       } else {
         stand(currentHandIndex);
       }
     }
+
+    setData();
   }
 
   function stand(currentHandIndex) {
-    if (currentHandIndex < playerCards.length - 1) {
+    updateLiveData();
+
+    if (currentHandIndex < livePlayerCards.length - 1) {
       setCurrentHandIndex(currentHandIndex + 1);
       hit(currentHandIndex + 1);
       disableDoubleButton(false);
@@ -213,17 +217,54 @@ export default function Home() {
       }, 500);
       setTimeout(() => {
         dealerPlay();
-      }, 1500);
+      }, 1200);
     }
   }
 
   function surrender() {
-    console.log('surrender');
+    updateLiveData();
+    liveWinningsArray[0] *= 0.5;
+    livePlayerCards = [[]];
+    checkOutcome(false);
+  }
+
+  function refuseInsurance() {
+    updateLiveData();
+
+    if (isBlackjack(liveDealerCards)) {
+      setHiddenCard(false);
+      checkOutcome(currentHandIndex);
+      setAskInsurance(false);
+    } else {
+      setAskInsurance(false);
+    }
+  }
+  function payInsurance() {
+    updateLiveData();
+    if (isBlackjack(liveDealerCards)) {
+      setHiddenCard(false);
+      checkOutcome(currentHandIndex);
+      setAskInsurance(false);
+      setBank(prevAmt => prevAmt + insuranceBet * 2);
+    } else {
+      setBank(prevAmt => prevAmt - insuranceBet);
+      setAskInsurance(false);
+    }
   }
 
   // -----------------------------------------------------
   // - Processing Logic
   // -----------------------------------------------------
+
+  function startNewGame() {
+    setCurrentHandIndex(0);
+    setGameInProgress(true);
+    setHiddenCard(true);
+
+    livePlayerCards = [[]];
+    liveDealerCards = [];
+    liveWinningsArray = [betAmount];
+  }
 
   function resetTable() {
     setPlayingDeck([]);
@@ -231,6 +272,7 @@ export default function Home() {
     setPlayerCards([[]]);
     setPile([]);
     setDeckIndex(0);
+    // setInsuranceBet(0);
     resetButtons();
   }
 
@@ -240,47 +282,57 @@ export default function Home() {
     return deckIndex + cardIndexModifier;
   }
 
-  function updateCardsTestArray() {
-    if (playerCardsTestArray.length === 0) {
-      playerCardsTestArray = playerCards;
+  function updateLiveData() {
+    if (livePlayerCards.length === 0) {
+      livePlayerCards = playerCards;
     }
-    if (dealerCardsTestArray.length === 0) {
-      dealerCardsTestArray = dealerCards;
+    if (liveDealerCards.length === 0) {
+      liveDealerCards = dealerCards;
+    }
+    if (liveWinningsArray.length === 0) {
+      liveWinningsArray = winningsArray;
     }
   }
 
-  function updatePlayerBetAmountArray() {
-    if (betAmountTestArray.length === 0) {
-      betAmountTestArray = betAmountArray;
+  function setData() {
+    if (livePlayerCards.length !== 0) {
+      setPlayerCards(livePlayerCards);
+    }
+    if (liveDealerCards.length !== 0) {
+      setDealerCards(liveDealerCards);
+    }
+    if (liveWinningsArray.length !== 0) {
+      setWinningsArray(liveWinningsArray);
     }
   }
 
   function dealCard(targetArray) {
     const newCard = playingDeck[nextCardsIndex()];
-    setPile([...pile, newCard]);
+    setPile(prevPile => [...prevPile, newCard]);
     let handWithNewCard = [...targetArray, newCard];
     return handWithNewCard;
   }
 
   function dealerPlay() {
-    let updatedDealerCards = [...dealerCards];
-    let newDrawCardIndex = deckIndex;
+    updateLiveData();
     let dealerBust = false;
+    let soft17 = aceExists(liveDealerCards) ? true : false;
+
     function drawCard() {
-      if (sumFinalValues(updatedDealerCards) < 17) {
-        updatedDealerCards = [...updatedDealerCards, playingDeck[newDrawCardIndex]];
-        dealerCardsTestArray = [...updatedDealerCards];
-        setDealerCards([...updatedDealerCards]);
-        setPile(prevPile => [...prevPile, playingDeck[newDrawCardIndex]]);
-        newDrawCardIndex++;
-        setDeckIndex(newDrawCardIndex);
+      if (getHandsSumInt(liveDealerCards) < 17) {
+        liveDealerCards = dealCard(liveDealerCards);
         setTimeout(drawCard, 1000);
-      } else {
-        if (sumFinalValues(updatedDealerCards) > 21) {
-          dealerBust = true;
-        }
-        checkOutcome(dealerBust, updatedDealerCards);
+      } else if (getHandsSumInt(liveDealerCards) === 17 && soft17) {
+        liveDealerCards = dealCard(liveDealerCards);
+        soft17 = false;
+        setTimeout(drawCard, 1000);
+      } else if (getHandsSumInt(liveDealerCards) > 21) {
+        dealerBust = true;
+        checkOutcome(dealerBust);
+      } else if (getHandsSumInt(liveDealerCards) > 17) {
+        checkOutcome(dealerBust);
       }
+      setData();
     }
     drawCard();
   }
@@ -304,95 +356,89 @@ export default function Home() {
   // -----------------------------------------------------
   // - Outcome Logic
   // -----------------------------------------------------
-
-  function compareHands(handIndex, updatedDealerCards) {
-    // updateCardsTestArray();
-    updatePlayerBetAmountArray();
-    let playerVal = sumFinalValues(playerCardsTestArray[handIndex]);
-    let dealerVal = sumFinalValues(updatedDealerCards);
-    if (playerVal > 21) {
-      lose(handIndex);
-    } else if (playerVal === dealerVal) {
-      push(handIndex);
-    } else if (playerVal > dealerVal) {
-      win(handIndex);
-    } else {
-      lose(handIndex);
-    }
-  }
-
-  function didBust(handArray) {
-    if (sumFinalValues(handArray) > 21) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  function checkOutcome(dealerBust, updatedDealerCards) {
+  function checkOutcome(dealerBust) {
+    updateLiveData();
     setHiddenCard(false);
-    updateCardsTestArray();
-    updatePlayerBetAmountArray();
-    console.log(`check outcome test arr`);
-    console.log(playerCardsTestArray);
+
     if (dealerBust) {
-      for (let handIndex in playerCardsTestArray) {
-        console.log(`${sumFinalValues(playerCardsTestArray[handIndex])} || ${sumFinalValues(updatedDealerCards)}`);
-        if (didBust(playerCardsTestArray[handIndex])) {
+      for (let handIndex in livePlayerCards) {
+        if (didBust(livePlayerCards[handIndex])) {
           lose(handIndex);
         } else {
           win(handIndex);
         }
       }
     } else {
-      for (let handIndex in playerCardsTestArray) {
-        console.log(`handIndex ${handIndex}`);
-        console.log(playerCardsTestArray);
-        console.log(`${sumFinalValues(playerCardsTestArray[handIndex])} || ${sumFinalValues(updatedDealerCards)}`);
-        compareHands(handIndex, updatedDealerCards);
+      for (let handIndex in livePlayerCards) {
+        compareHands(handIndex);
       }
     }
-
-    setGameInProgress(false);
-    resetButtons();
     setGameCount(prevCount => prevCount + 1);
+    checkNeedsShuffle();
+    calculatePayout();
+  }
+
+  function compareHands(handIndex) {
+    updateLiveData();
+    let playerVal = getHandsSumInt(livePlayerCards[handIndex]);
+    let dealerVal = getHandsSumInt(liveDealerCards);
+    if (playerVal > 21) {
+      lose(handIndex);
+    } else if (playerVal === dealerVal) {
+      push(handIndex);
+    } else if (playerVal > dealerVal) {
+      win(handIndex);
+    } else if (playerVal < dealerVal) {
+      lose(handIndex);
+    }
+    setData();
+  }
+
+  function didBust(handArray) {
+    if (getHandsSumInt(handArray) > 21) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   function win(handIndex) {
+    updateLiveData();
     setWinCount(prevCount => prevCount + 1);
-    winnings = betAmountTestArray.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
-    console.log(`bet amt------`);
-    console.log(betAmountTestArray);
-    console.log(`winnings ${winnings}`);
-    setBank(prevAmount => prevAmount + winnings);
-    console.log(handIndex, 'win');
+    liveWinningsArray[handIndex] = liveWinningsArray[handIndex] * 1;
+    setData();
   }
 
   function lose(handIndex) {
+    updateLiveData();
     setLoseCount(prevCount => prevCount + 1);
-    betAmountTestArray[handIndex] = betAmountTestArray[handIndex] * -1;
-    console.log(`bet amt------`);
-    console.log(betAmountTestArray);
-    winnings = betAmountTestArray.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
-    console.log(`losses ${winnings}`);
-    setBank(prevAmount => prevAmount + winnings);
-    console.log(handIndex, 'lose');
+    liveWinningsArray[handIndex] = liveWinningsArray[handIndex] * -1;
+    setData();
   }
 
   function push(handIndex) {
+    updateLiveData();
     setPushCount(prevCount => prevCount + 1);
-    betAmountTestArray[handIndex] = betAmountTestArray[handIndex] * 0;
-    console.log(`bet amt------`);
-    console.log(betAmountTestArray);
-    winnings = betAmountTestArray.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
-    console.log(handIndex, 'push');
+    liveWinningsArray[handIndex] = liveWinningsArray[handIndex] * 0;
+    setData();
   }
 
-  // function checkNeedsShuffle(cutIndex, currentIndex) {
-  //   if (cutIndex < currentIndex) {
-  //     setNeedsShuffle(true);
-  //   }
-  // }
+  function calculatePayout() {
+    updateLiveData();
+    winnings = liveWinningsArray.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+    setBank(prevAmt => prevAmt + winnings);
+    setGameInProgress(false);
+    resetButtons();
+  }
+
+  function checkNeedsShuffle() {
+    if (deckIndex > cutIndex) {
+      createNewTable(deckAmount);
+      setPile([]);
+
+      setCutIndex(getRandomInRange(deckAmount));
+    }
+  }
 
   // -----------------------------------------------------
   // -
@@ -400,6 +446,13 @@ export default function Home() {
   const actions = {
     deal: {
       func: () => deal(),
+      disabled: betAmount <= 0 ? true : false,
+    },
+    refuseInsurance: {
+      func: () => refuseInsurance(),
+    },
+    payInsurance: {
+      func: () => payInsurance(),
     },
     split: {
       func: currentHandIndex => () => split(currentHandIndex),
@@ -418,13 +471,14 @@ export default function Home() {
       disabled: standButton,
     },
     surrender: {
-      func: currentHandIndex => () => surrender(currentHandIndex),
+      func: () => surrender(),
       disabled: surrenderButton,
     },
     resetDeck: {
       func: () => {
         resetTable();
-        shuffleDecks();
+        createNewTable(deckAmount);
+        setSettingsModalIsOpen(false);
       },
       disabled: false,
     },
@@ -438,29 +492,33 @@ export default function Home() {
         setHiddenCard(true);
       }
     },
-    addToDealer: () => {
-      setDealerCards([...dealerCards, playingDeck[deckIndex]]);
-    },
-    printDealer: () => console.log(dealerCards),
-    printPlayer: () => {
+
+    printCardArrays: () => {
       console.log(`player cards`);
       console.log(playerCards);
       console.log(`dealer cards`);
       console.log(dealerCards);
       console.log(`bet array`);
-      console.log(betAmountArray);
-      console.log(`${sumFinalValues(playerCards[0])} || ${sumFinalValues(dealerCards)}`);
+      console.log(winningsArray);
+      console.log(`${getHandsSumInt(playerCards[0])} || ${getHandsSumInt(dealerCards)}`);
     },
-    printDeck: () => console.log(playingDeck),
-    printDeckCount: () => console.log(playingDeck.length),
-    printPile: () => console.log(pile),
+
     printStates: () => {
-      // console.log(`x = ${x}`);
-      console.log(`winnings = ${winnings}`);
-      console.log(`betAmount = ${betAmount}`);
+      console.log(playingDeck);
+      console.log(`deckIndex = ${deckIndex}`);
+      console.log(pile);
+      console.log(insuranceBet);
+      console.log(bank);
+      // console.log(`winnings = ${winnings}`);
+      // console.log(`betAmount = ${betAmount}`);
     },
-    printAce: () => console.log(sumWithAce(playerCards[0])),
-    // checkNum: () => checkNum(),
+
+    printAce: () => console.log(getHandsSumString(playerCards[0])),
+
+    checkIfBlackjack: () => console.log(isBlackjack(playerCards[0])),
+    getHandsSumString: () => console.log(getHandsSumString(playerCards[0])),
+    getHandsSumInt: () => console.log(getHandsSumInt(playerCards[0])),
+    dealerShowingAce: () => console.log(dealerShowingAce(playerCards[0])),
   };
 
   return (
@@ -468,54 +526,36 @@ export default function Home() {
       value={{
         deckAmount,
         setDeckAmount,
-        playingDeck,
-        setPlayingDeck,
-        deckIndex,
-        setDeckIndex,
-        cutIndex,
-        setCutIndex,
-        needsShuffle,
-        setNeedsShuffle,
-        isShuffled,
-        setIsShuffled,
         gameInProgress,
-        setGameInProgress,
+        askInsurance,
+
         dealerCards,
-        setDealerCards,
         hiddenCard,
-        setHiddenCard,
         playerCards,
-        setPlayerCards,
         currentHandIndex,
-        setCurrentHandIndex,
+
         splitButton,
-        disableSplitButton,
         doubleButton,
-        disableDoubleButton,
         hitButton,
-        disableHitButton,
         standButton,
-        disableStandButton,
         surrenderButton,
-        disableSurrenderButton,
         settingsModalIsOpen,
         setSettingsModalIsOpen,
+
         pile,
-        setPile,
+
         gameCount,
-        setGameCount,
         winCount,
-        setWinCount,
         pushCount,
-        setPushCount,
         loseCount,
-        setLoseCount,
+
         bank,
         setBank,
         betAmount,
         setBetAmount,
+        insuranceBet,
+        setInsuranceBet,
 
-        hasInitialized,
         mitCount,
 
         actions,

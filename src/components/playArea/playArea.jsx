@@ -1,6 +1,6 @@
 import DealerCardsContainer from './dealerCardsContainer';
 import PlayerCardsContainer from './playerCardsContainer';
-import DevButtons from '../devTools/devButtons';
+// import DevButtons from '../devTools/devButtons';
 import './playArea.css';
 import Settings from '../ui/settings';
 import '../ui/settings.css';
@@ -13,7 +13,7 @@ export default function PlayArea() {
   return (
     <>
       {settingsModalIsOpen ? <Settings /> : <></>}
-      <DevButtons />
+      {/* <DevButtons /> */}
       <div className="play-area flex-column align-center">
         <DealerCardsContainer />
         <PlayerCardsContainer />

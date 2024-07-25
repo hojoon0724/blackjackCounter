@@ -46,12 +46,24 @@ export default function DevButtons() {
       <button style={{ fontSize: '1rem', margin: '.5rem' }} onClick={devActions.checkNum}>
         checkNum
       </button>
+      <button style={{ fontSize: '1rem', margin: '.5rem' }} onClick={devActions.checkIfBlackjack}>
+        checkIfBlackjack
+      </button>
+      <button style={{ fontSize: '1rem', margin: '.5rem' }} onClick={devActions.getHandsSumString}>
+        getHandsSumString
+      </button>
+      <button style={{ fontSize: '1rem', margin: '.5rem' }} onClick={devActions.getHandsSumInt}>
+        getHandsSumInt
+      </button>
+      <button style={{ fontSize: '1rem', margin: '.5rem' }} onClick={devActions.funcName}>
+        funcName
+      </button>
       */}
       <button style={{ fontSize: '1rem', margin: '.5rem' }} onClick={devActions.printStates}>
         printStates
       </button>
-      <button style={{ fontSize: '1rem', margin: '.5rem' }} onClick={devActions.printPlayer}>
-        printPlayer
+      <button style={{ fontSize: '1rem', margin: '.5rem' }} onClick={devActions.printCardArrays}>
+        printCardArrays
       </button>
     </div>
   );
