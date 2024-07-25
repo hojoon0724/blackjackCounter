@@ -2,34 +2,24 @@ import { useContext } from 'react';
 import { GameContext } from '../../pages/home';
 
 export function BettingBar() {
-  const { setBetAmount } = useContext(GameContext);
+  const { setBetAmount, setBank } = useContext(GameContext);
+
+  function processBet(amount) {
+    setBank(prevAmt => prevAmt - amount);
+    setBetAmount(prevAmt => prevAmt + amount);
+  }
+
+  const chipsArray = [1, 5, 10, 25, 50, 100, 500, 1000];
 
   return (
     <div className="betting-bar-container flex-row">
-      <div className="betting-chip bet-1" onClick={() => setBetAmount(prevAmt => prevAmt + 1)}>
-        1
-      </div>
-      <div className="betting-chip bet-5" onClick={() => setBetAmount(prevAmt => prevAmt + 5)}>
-        5
-      </div>
-      <div className="betting-chip bet-10" onClick={() => setBetAmount(prevAmt => prevAmt + 10)}>
-        10
-      </div>
-      <div className="betting-chip bet-25" onClick={() => setBetAmount(prevAmt => prevAmt + 25)}>
-        25
-      </div>
-      <div className="betting-chip bet-50" onClick={() => setBetAmount(prevAmt => prevAmt + 50)}>
-        50
-      </div>
-      <div className="betting-chip bet-100" onClick={() => setBetAmount(prevAmt => prevAmt + 100)}>
-        100
-      </div>
-      <div className="betting-chip bet-500" onClick={() => setBetAmount(prevAmt => prevAmt + 500)}>
-        500
-      </div>
-      <div className="betting-chip bet-1000" onClick={() => setBetAmount(prevAmt => prevAmt + 1000)}>
-        1000
-      </div>
+      {chipsArray.map(chip => {
+        return (
+          <div className={`betting-chip bet-${chip}`} onClick={() => processBet(chip)}>
+            {chip}
+          </div>
+        );
+      })}
     </div>
   );
 }

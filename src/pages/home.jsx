@@ -10,7 +10,7 @@ import {
   dealerShowingTen,
   sumMitCount,
 } from '../gameLogic/mathFunctions';
-import { canSplit, getRandomInRange, getHandsSumRaw } from '../gameLogic/helperFunctions';
+import { aceExists, canSplit, getRandomInRange } from '../gameLogic/helperFunctions';
 
 // UI Components
 import TopBar from '../components/ui/topBar';
@@ -75,9 +75,9 @@ export default function Home() {
     }
   }, [deckAmount]);
 
-  useEffect(() => {
-    setBank(prevAmt => prevAmt - betAmount);
-  }, [betAmount]);
+  // useEffect(() => {
+  //   setBank(prevAmt => prevAmt - betAmount);
+  // }, [betAmount]);
 
   function createNewTable(deckAmount) {
     let newDeck = getNewDeck(deckAmount);
@@ -286,6 +286,8 @@ export default function Home() {
     setDealerCards([]);
     setPlayerCards([[]]);
     setPile([]);
+    setWinningsArray([betAmount]);
+    setHandOutcomes([]);
     setDeckIndex(0);
     // setInsuranceBet(0);
     resetButtons();
@@ -337,20 +339,24 @@ export default function Home() {
   function dealerPlay() {
     updateLiveData();
     let dealerBust = false;
-    // let soft17 = aceExists(liveDealerCards) ? true : false;
+    let soft17 = aceExists(liveDealerCards) ? true : false;
 
     function drawCard() {
-      if (getHandsSumRaw(liveDealerCards) < 17) {
+      // under 17
+      if (getHandsSumInt(liveDealerCards) < 17) {
         liveDealerCards = dealCard(liveDealerCards);
         setTimeout(drawCard, 1000);
-        // } else if (getHandsSumRaw(liveDealerCards) === 17 && soft17) {
-        //   liveDealerCards = dealCard(liveDealerCards);
-        // soft17 = false;
-        // setTimeout(drawCard, 1000);
-      } else if (getHandsSumRaw(liveDealerCards) >= 17) {
-        checkOutcome(dealerBust);
-      } else if (getHandsSumRaw(liveDealerCards) > 21) {
+        // 17 but soft
+      } else if (getHandsSumInt(liveDealerCards) === 17 && soft17) {
+        liveDealerCards = dealCard(liveDealerCards);
+        soft17 = false;
+        setTimeout(drawCard, 1000);
+        // bust
+      } else if (getHandsSumInt(liveDealerCards) > 21) {
         dealerBust = true;
+        checkOutcome(dealerBust);
+        // 17 or above
+      } else if (getHandsSumInt(liveDealerCards) >= 17) {
         checkOutcome(dealerBust);
       }
       setData();
@@ -453,6 +459,8 @@ export default function Home() {
     setBank(prevAmt => prevAmt + winnings);
     setGameInProgress(false);
     resetButtons();
+    setBank(prevAmt => prevAmt - betAmount);
+    setData();
   }
 
   function checkNeedsShuffle() {
