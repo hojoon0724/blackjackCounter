@@ -46,13 +46,6 @@
   width: fit-content;
 }
 
-.dealer-cards-container > .card {
-  /* box-sizing: content-box;
-  width: var(--card-width);
-  height: var(--card-height);
-  margin: 0 0.75svh; */
-}
-
 .card-container {
   box-shadow: 1px 1px 4px black;
   border-radius: 3%;

@@ -108,8 +108,8 @@ export default function Home() {
     disableStandButton(false);
     disableSurrenderButton(false);
     if (livePlayerCards[0][0].value === livePlayerCards[0][1].value) {
+      disableSplitButton(false);
     }
-    disableSplitButton(false);
 
     if (isBlackjack(livePlayerCards[0])) {
       liveWinningsArray[0] *= 1.5;
