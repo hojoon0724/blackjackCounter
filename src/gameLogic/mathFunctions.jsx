@@ -47,6 +47,10 @@ export function dealerShowingTen(handArray) {
 }
 
 export function sumMitCount(pileArray) {
-  const mitCountSum = pileArray.reduce((n, { mitCountValue }) => n + mitCountValue, 0);
-  return mitCountSum;
+  try {
+    const mitCountSum = pileArray.reduce((n, { mitCountValue }) => n + mitCountValue, 0);
+    return mitCountSum;
+  } catch (error) {
+    console.log(error);
+  }
 }

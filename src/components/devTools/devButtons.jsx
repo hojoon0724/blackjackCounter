@@ -68,6 +68,12 @@ export default function DevButtons() {
       <button style={{ fontSize: '1rem', margin: '.5rem' }} onClick={devActions.printMoney}>
         printMoney
       </button>
+      <button style={{ fontSize: '1rem', margin: '.5rem' }} onClick={devActions.hiddenCard}>
+        hiddenCard
+      </button>
+      <button style={{ fontSize: '1rem', margin: '.5rem' }} onClick={devActions.devPeekHiddenCard}>
+        devPeekHiddenCard
+      </button>
     </div>
   );
 }

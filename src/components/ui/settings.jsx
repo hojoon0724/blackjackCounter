@@ -3,6 +3,7 @@ import { GameContext } from '../../pages/home';
 
 import DeckAmountInput from './deckAmountInput';
 import ShuffleButton from './shuffleButton';
+import ResetAllStats from './resetAllStats';
 
 export default function Settings() {
   const { settingsModalIsOpen, setSettingsModalIsOpen } = useContext(GameContext);
@@ -15,6 +16,9 @@ export default function Settings() {
         </div>
         <div className="setting-row flex-row align-center">
           <ShuffleButton />
+        </div>
+        <div className="setting-row flex-row align-center">
+          <ResetAllStats />
         </div>
         <button className="close-settings-modal" onClick={() => setSettingsModalIsOpen(false)}>
           Close

@@ -13,6 +13,8 @@ let USDollar = new Intl.NumberFormat('en-US', {
 export default function PlayerCardsContainer() {
   const { playerCards, betAmount, setBetAmount, setBank, winningsArray, gameInProgress } = useContext(GameContext);
 
+  const chipsArray = [1, 5, 10, 25];
+
   return (
     <div className="player-container">
       <div className="player-hand flex-row justify-center">
@@ -52,7 +54,21 @@ export default function PlayerCardsContainer() {
             </motion.div>
           )}
         </AnimatePresence>
-        <div className="player-chip-area"></div>
+        <div className="player-chip-area flex-row align-center">
+          <div className="chip-stack flex-row align-center justify-center">
+            {chipsArray.toReversed().map((chip, index) => {
+              return (
+                <div
+                  className={`chips-stacked betting-chip bet-${chip}`}
+                  key={`betting-chip-${chip}`}
+                  style={{ top: `-${index * 5}px` }}
+                >
+                  {chip}
+                </div>
+              );
+            })}
+          </div>
+        </div>
         <AnimatePresence>
           {gameInProgress ? (
             <motion.div

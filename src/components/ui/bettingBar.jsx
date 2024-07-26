@@ -15,7 +15,7 @@ export function BettingBar() {
     <div className="betting-bar-container flex-row">
       {chipsArray.map(chip => {
         return (
-          <div className={`betting-chip bet-${chip}`} onClick={() => processBet(chip)}>
+          <div className={`betting-chip bet-${chip}`} onClick={() => processBet(chip)} key={`betting-chip-${chip}`}>
             {chip}
           </div>
         );

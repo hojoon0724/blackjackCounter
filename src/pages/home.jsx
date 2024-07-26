@@ -7,7 +7,6 @@ import {
   getHandsSumString,
   isBlackjack,
   dealerShowingAce,
-  dealerShowingTen,
   sumMitCount,
 } from '../gameLogic/mathFunctions';
 import { aceExists, canSplit, getRandomInRange } from '../gameLogic/helperFunctions';
@@ -32,6 +31,8 @@ export default function Home() {
 
   const [dealerCards, setDealerCards] = useState([]);
   const [hiddenCard, setHiddenCard] = useState(true);
+  const [peekHiddenCard, setPeekHiddenCard] = useState(false);
+
   const [playerCards, setPlayerCards] = useState([]);
   const [currentHandIndex, setCurrentHandIndex] = useState(0);
 
@@ -50,7 +51,9 @@ export default function Home() {
   const [pushCount, setPushCount] = useState(0);
   const [loseCount, setLoseCount] = useState(0);
 
-  const [bank, setBank] = useState(10000);
+  const [bank, setBank] = useState(localStorage.getItem('bankroll') ? localStorage.getItem('bankroll') : 10000);
+  const minBankroll = 0;
+
   const [betAmount, setBetAmount] = useState(0);
   const [insuranceBet, setInsuranceBet] = useState(betAmount / 2);
   // const maxInsurance = betAmount / 2;
@@ -75,13 +78,14 @@ export default function Home() {
     }
   }, [deckAmount]);
 
-  // useEffect(() => {
-  //   setBank(prevAmt => prevAmt - betAmount);
-  // }, [betAmount]);
+  useEffect(() => {
+    localStorage.setItem('bankroll', bank);
+  }, [bank]);
 
   function createNewTable(deckAmount) {
     let newDeck = getNewDeck(deckAmount);
     setPlayingDeck(newDeck);
+    setDeckIndex(0);
     setGameInProgress(false);
   }
 
@@ -121,16 +125,7 @@ export default function Home() {
       if (dealerShowingAce(liveDealerCards)) {
         setAskInsurance(true);
       }
-
-      if (dealerShowingTen(liveDealerCards)) {
-        setTimeout(() => {
-          if (isBlackjack(liveDealerCards)) {
-            checkOutcome(currentHandIndex);
-          }
-        }, 1500);
-      }
     }
-
     setData();
   }
 
@@ -145,6 +140,8 @@ export default function Home() {
     let newHand = [livePlayerCards[currentHandIndex][1]];
     livePlayerCards = [...livePlayerCards, newHand];
     livePlayerCards[currentHandIndex].pop();
+
+    // splitting aces
     if (livePlayerCards[0][0].value === 1 && livePlayerCards[1][0].value === 1) {
       setTimeout(() => {
         livePlayerCards[currentHandIndex] = dealCard(livePlayerCards[currentHandIndex]);
@@ -153,15 +150,17 @@ export default function Home() {
         livePlayerCards[currentHandIndex + 1] = dealCard(livePlayerCards[currentHandIndex + 1]);
       }, 500);
       setTimeout(() => {
-        checkOutcome(currentHandIndex);
-      }, 2000);
+        setCurrentHandIndex(currentHandIndex + 1);
+        stand(currentHandIndex[currentHandIndex + 1]);
+      }, 1000);
     } else {
-      livePlayerCards[currentHandIndex] = dealCard(livePlayerCards[currentHandIndex]);
+      hit(currentHandIndex);
+      // livePlayerCards[currentHandIndex] = dealCard(livePlayerCards[currentHandIndex]);
 
-      if (isBlackjack(livePlayerCards[currentHandIndex])) {
-        liveHandOutcomes[currentHandIndex] = 'Blackjack';
-        stand(currentHandIndex);
-      }
+      // if (isBlackjack(livePlayerCards[currentHandIndex])) {
+      //   liveHandOutcomes[currentHandIndex] = 'Blackjack';
+      //   stand(currentHandIndex);
+      // }
     }
 
     setData();
@@ -196,7 +195,9 @@ export default function Home() {
     }
 
     if (getHandsSumInt(livePlayerCards[currentHandIndex]) === 21) {
-      stand(currentHandIndex);
+      setTimeout(() => {
+        stand(currentHandIndex);
+      }, 500);
     }
 
     if (getHandsSumInt(livePlayerCards[currentHandIndex]) > 21) {
@@ -227,7 +228,7 @@ export default function Home() {
       }, 500);
       setTimeout(() => {
         dealerPlay();
-      }, 1200);
+      }, 1000);
     }
   }
 
@@ -240,26 +241,34 @@ export default function Home() {
 
   function refuseInsurance() {
     updateLiveData();
+    animatePeekHiddenCard();
 
-    if (isBlackjack(liveDealerCards)) {
-      setHiddenCard(false);
-      checkOutcome(currentHandIndex);
-      setAskInsurance(false);
-    } else {
-      setAskInsurance(false);
-    }
+    setTimeout(() => {
+      if (isBlackjack(liveDealerCards)) {
+        setHiddenCard(false);
+        checkOutcome(currentHandIndex);
+        setAskInsurance(false);
+      } else {
+        setAskInsurance(false);
+      }
+    }, 1000);
   }
   function payInsurance() {
     updateLiveData();
-    if (isBlackjack(liveDealerCards)) {
-      setHiddenCard(false);
-      checkOutcome(currentHandIndex);
-      setAskInsurance(false);
-      setBank(prevAmt => prevAmt + insuranceBet * 2);
-    } else {
-      setBank(prevAmt => prevAmt - insuranceBet);
-      setAskInsurance(false);
-    }
+    animatePeekHiddenCard();
+    setBank(prevAmt => prevAmt - insuranceBet);
+
+    setTimeout(() => {
+      if (isBlackjack(liveDealerCards)) {
+        setHiddenCard(false);
+        checkOutcome(currentHandIndex);
+        setAskInsurance(false);
+        setBank(prevAmt => prevAmt + insuranceBet + insuranceBet * 2);
+      } else {
+        setBank(prevAmt => prevAmt - insuranceBet);
+        setAskInsurance(false);
+      }
+    });
   }
 
   function addBet() {
@@ -345,12 +354,12 @@ export default function Home() {
       // under 17
       if (getHandsSumInt(liveDealerCards) < 17) {
         liveDealerCards = dealCard(liveDealerCards);
-        setTimeout(drawCard, 1000);
-        // 17 but soft
+        setTimeout(drawCard, 750);
+        // soft 17
       } else if (getHandsSumInt(liveDealerCards) === 17 && soft17) {
         liveDealerCards = dealCard(liveDealerCards);
         soft17 = false;
-        setTimeout(drawCard, 1000);
+        setTimeout(drawCard, 750);
         // bust
       } else if (getHandsSumInt(liveDealerCards) > 21) {
         dealerBust = true;
@@ -362,6 +371,12 @@ export default function Home() {
       setData();
     }
     drawCard();
+  }
+  function animatePeekHiddenCard() {
+    setPeekHiddenCard(true);
+    setTimeout(() => {
+      setPeekHiddenCard(false);
+    }, 800);
   }
 
   function disableAllButtons() {
@@ -461,19 +476,23 @@ export default function Home() {
     resetButtons();
     setBank(prevAmt => prevAmt - betAmount);
     setData();
+    // console.log(`gameCount: ${gameCount}`);
+    // console.log(`pile.length: ${pile.length}`);
+    // console.log(`deckIndex: ${deckIndex}`);
+    // console.log(`cutIndex: ${cutIndex}`);
+    // console.log('------------');
   }
 
   function checkNeedsShuffle() {
     if (deckIndex > cutIndex) {
       createNewTable(deckAmount);
       setPile([]);
-
       setCutIndex(getRandomInRange(deckAmount));
     }
   }
 
   // -----------------------------------------------------
-  // -
+  // - Action Triggers
   // -----------------------------------------------------
   const actions = {
     deal: {
@@ -514,6 +533,20 @@ export default function Home() {
       },
       disabled: false,
     },
+    resetAllStats: {
+      func: () => {
+        resetTable();
+        createNewTable(deckAmount);
+        setGameCount(0);
+        setWinCount(0);
+        setPushCount(0);
+        setLoseCount(0);
+        setBank(10000);
+        setBetAmount(0);
+        setSettingsModalIsOpen(false);
+      },
+      disabled: false,
+    },
   };
 
   const devActions = {
@@ -540,6 +573,8 @@ export default function Home() {
       console.log(winningsArray);
       console.log(`insuranceBet`);
       console.log(insuranceBet);
+      console.log(`peekHiddenCard`);
+      console.log(peekHiddenCard);
     },
 
     printMoney: () => {
@@ -553,11 +588,22 @@ export default function Home() {
     },
 
     printAce: () => console.log(getHandsSumString(playerCards[0])),
-
     checkIfBlackjack: () => console.log(isBlackjack(playerCards[0])),
     getHandsSumString: () => console.log(getHandsSumString(playerCards[0])),
     getHandsSumInt: () => console.log(getHandsSumInt(playerCards[0])),
     dealerShowingAce: () => console.log(dealerShowingAce(playerCards[0])),
+    hiddenCard: () => {
+      console.log(hiddenCard);
+      setHiddenCard(hiddenCard ? false : true);
+    },
+    devPeekHiddenCard: () => {
+      console.log(peekHiddenCard);
+
+      setPeekHiddenCard(true);
+      setTimeout(() => {
+        setPeekHiddenCard(false);
+      }, 800);
+    },
   };
 
   return (
@@ -570,6 +616,7 @@ export default function Home() {
 
         dealerCards,
         hiddenCard,
+        peekHiddenCard,
         playerCards,
         currentHandIndex,
 
@@ -590,6 +637,7 @@ export default function Home() {
 
         bank,
         setBank,
+        minBankroll,
         betAmount,
         setBetAmount,
         insuranceBet,

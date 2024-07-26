@@ -1,10 +1,10 @@
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useAnimation } from 'framer-motion';
 import { getHandsSumInt } from '../../gameLogic/mathFunctions';
 import { useState, useEffect, useContext } from 'react';
 import { GameContext } from '../../pages/home';
 
 export default function DealerCardsContainer() {
-  const { dealerCards, hiddenCard } = useContext(GameContext);
+  const { dealerCards, hiddenCard, peekHiddenCard } = useContext(GameContext);
 
   const [containerWidth, setContainerWidth] = useState('calc(var(--card-width) + 1.5svh)');
   const [cardValSum, setCardValSum] = useState(0);
@@ -21,6 +21,19 @@ export default function DealerCardsContainer() {
     }, 750);
     return () => clearTimeout(timeoutId);
   }, [hiddenCard, dealerCards]);
+
+  const control = useAnimation();
+
+  useEffect(() => {
+    async function startPeekCardAnimation() {
+      if (peekHiddenCard) {
+        await control.start({ rotateX: -50 });
+        await new Promise(resolve => setTimeout(resolve, 100));
+        control.start({ rotateX: 0 });
+      }
+    }
+    startPeekCardAnimation();
+  }, [peekHiddenCard, control]);
 
   if (dealerCards.length > 0) {
     return (
@@ -46,15 +59,19 @@ export default function DealerCardsContainer() {
             >
               <motion.div
                 className="card-container"
-                transition={{ duration: hiddenCard ? 0 : 0.5, ease: 'circInOut', perspective: 1000 }}
+                transition={{
+                  duration: hiddenCard ? (peekHiddenCard ? 0.5 : 0) : 0.5,
+                  ease: 'circInOut',
+                  perspective: 1000,
+                }}
                 initial={{ rotateY: 180, perspective: 1000 }}
-                animate={{ rotateY: 0, perspective: 1000 }}
+                animate={{ rotateY: 0, perspective: 1000, boxShadow: 'none' }}
               >
                 <motion.img
                   className="front"
                   transition={{ duration: hiddenCard ? 0 : 0.5, ease: 'circInOut' }}
                   initial={{ rotateY: 0, perspective: 1000 }}
-                  animate={{ rotateY: hiddenCard ? 180 : 0, perspective: 1000 }}
+                  animate={{ rotateY: hiddenCard ? 180 : 0, perspective: 1000, boxShadow: '1px 1px 4px black' }}
                   src={dealerCards[0].cardSvg}
                   alt={dealerCards[0].name}
                   style={{ position: 'absolute' }}
@@ -62,9 +79,17 @@ export default function DealerCardsContainer() {
 
                 <motion.img
                   className="back"
-                  transition={{ duration: hiddenCard ? 0 : 0.5, ease: 'circInOut' }}
+                  transition={{ duration: hiddenCard ? (peekHiddenCard ? 0.5 : 0) : 0.5, ease: 'anticipate' }}
                   initial={{ rotateY: 180, opacity: 0, perspective: 1000 }}
-                  animate={{ rotateY: hiddenCard ? 0 : 180, opacity: 1, perspective: 1000 }}
+                  animate={
+                    peekHiddenCard
+                      ? control
+                      : {
+                          rotateY: hiddenCard ? 0 : 180,
+                          opacity: 1,
+                          perspective: 1000,
+                        }
+                  }
                   exit={{ opacity: 0 }}
                   src="./assets/SVGs/00-back.svg"
                   alt={'card back side'}
@@ -116,6 +141,7 @@ export default function DealerCardsContainer() {
             })}
           </motion.div>
         </AnimatePresence>
+
         <div className="dealer-number-container flex-row justify-center align-center">
           <div className="dealer-card-value">{hiddenCard ? '' : cardValSum}</div>
         </div>

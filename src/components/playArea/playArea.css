@@ -117,14 +117,28 @@
 
 .player-chip-area {
   box-sizing: content-box;
-  min-height: calc(var(--card-width) / 3);
-  min-width: calc(var(--card-width) / 3);
+  position: relative;
+  min-height: calc(var(--card-width) / 2);
+  min-width: calc(var(--card-width) / 2);
   border-radius: 100%;
   margin: calc(var(--card-width) / 15);
-  padding: calc(var(--card-width) / 8);
+  padding: calc(var(--card-width) / 12);
   border: 1px solid rgba(255, 255, 255, 0.3);
+  justify-content: space-between;
 }
 
 .player-bet-reset-container {
   min-width: 8ch;
+}
+
+.chip-stack {
+  position: relative;
+  min-height: calc(var(--card-width) / 6);
+  min-width: calc(var(--card-width) / 6);
+  margin: auto;
+}
+
+.chips-stacked {
+  position: absolute;
+  transform: perspective(1000) rotateX(20deg);
 }
