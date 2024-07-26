@@ -1,3 +1,4 @@
+import { motion, AnimatePresence } from 'framer-motion';
 import PlayerHand from './components/playerHand';
 import { useContext } from 'react';
 import { GameContext } from '../../pages/home';
@@ -10,7 +11,7 @@ let USDollar = new Intl.NumberFormat('en-US', {
 });
 
 export default function PlayerCardsContainer() {
-  const { playerCards, betAmount, setBetAmount, setBank, winningsArray } = useContext(GameContext);
+  const { playerCards, betAmount, setBetAmount, setBank, winningsArray, gameInProgress } = useContext(GameContext);
 
   return (
     <div className="player-container">
@@ -22,20 +23,74 @@ export default function PlayerCardsContainer() {
         ))}
       </div>
       <div className="player-bet-container flex-row justify-center align-center">
-        <div className="player-bet-value">{USDollar.format(betAmount)}</div>
+        <AnimatePresence>
+          {gameInProgress ? (
+            <motion.div
+              transition={{
+                duration: 0.3,
+                ease: 'circInOut',
+              }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              key={'playerBetPerHand'}
+              className="player-bet-value"
+            ></motion.div>
+          ) : (
+            <motion.div
+              key={'playerBetPerHand'}
+              transition={{
+                duration: 0.3,
+                ease: 'circInOut',
+              }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="player-bet-value"
+            >
+              {USDollar.format(betAmount)}
+            </motion.div>
+          )}
+        </AnimatePresence>
         <div className="player-chip-area"></div>
-        <div className="player-bet-reset-container">
-          <button
-            className="player-bet-reset small-button"
-            onClick={() => {
-              let lastBet = betAmount;
-              setBetAmount(0);
-              setBank(prevAmt => prevAmt + lastBet);
-            }}
-          >
-            Reset
-          </button>
-        </div>
+        <AnimatePresence>
+          {gameInProgress ? (
+            <motion.div
+              transition={{
+                duration: 0.3,
+                ease: 'circInOut',
+              }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="player-bet-reset-container"
+              key={'playerResetButton'}
+            ></motion.div>
+          ) : (
+            <motion.div
+              transition={{
+                duration: 0.3,
+                ease: 'circInOut',
+              }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="player-bet-reset-container"
+              key={'playerResetButton'}
+            >
+              <button
+                className="player-bet-reset small-button"
+                onClick={() => {
+                  let lastBet = betAmount;
+                  setBetAmount(0);
+                  setBank(prevAmt => prevAmt + lastBet);
+                }}
+              >
+                Reset
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
