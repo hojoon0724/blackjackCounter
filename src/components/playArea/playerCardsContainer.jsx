@@ -94,8 +94,9 @@ export default function PlayerCardsContainer() {
               className="player-bet-reset-container"
               key={'playerResetButton'}
             >
-              <button
+              <motion.button
                 className="player-bet-reset small-button"
+                disabled={betAmount <= 0 ? true : false}
                 onClick={() => {
                   let lastBet = betAmount;
                   setBetAmount(0);
@@ -103,7 +104,7 @@ export default function PlayerCardsContainer() {
                 }}
               >
                 Reset
-              </button>
+              </motion.button>
             </motion.div>
           )}
         </AnimatePresence>

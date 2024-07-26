@@ -499,6 +499,14 @@ export default function Home() {
       func: () => deal(),
       disabled: betAmount <= 0 ? true : false,
     },
+    resetBetAmount: {
+      func: () => {
+        let lastBet = betAmount;
+        setBetAmount(0);
+        setBank(prevAmt => prevAmt + lastBet);
+      },
+      disabled: betAmount <= 0 ? true : false,
+    },
     refuseInsurance: {
       func: () => refuseInsurance(),
     },
