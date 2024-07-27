@@ -2,11 +2,20 @@ import { useContext } from 'react';
 import { GameContext } from '../../pages/home';
 
 export function BettingBar() {
-  const { setBetAmount, setBank } = useContext(GameContext);
+  const { setBetAmount, setBank, bank } = useContext(GameContext);
 
   function processBet(amount) {
-    setBank(prevAmt => prevAmt - amount);
-    setBetAmount(prevAmt => prevAmt + amount);
+    let bankroll = bank;
+    let overdraftAmount = Math.abs(bankroll - amount);
+    let maxBetAllowed = amount;
+    if (bankroll - amount < 0) {
+      overdraftAmount = bankroll - amount;
+      maxBetAllowed = amount + overdraftAmount;
+    }
+    console.log(`bankroll ${bankroll} // overdraftAmount ${overdraftAmount} // maxBetAllowed ${maxBetAllowed}`);
+
+    setBank(prevAmt => prevAmt - maxBetAllowed);
+    setBetAmount(prevAmt => prevAmt + maxBetAllowed);
   }
 
   const chipsArray = [1, 5, 10, 25, 50, 100, 500, 1000];

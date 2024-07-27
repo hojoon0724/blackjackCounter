@@ -133,7 +133,6 @@ export default function Home() {
     updateLiveData();
     disableSurrenderButton(true);
 
-    // const additionalBet = addBet();
     liveWinningsArray = [...liveWinningsArray, addBet()];
     liveHandOutcomes = [...liveHandOutcomes, 'Split'];
 
@@ -155,12 +154,6 @@ export default function Home() {
       }, 1000);
     } else {
       hit(currentHandIndex);
-      // livePlayerCards[currentHandIndex] = dealCard(livePlayerCards[currentHandIndex]);
-
-      // if (isBlackjack(livePlayerCards[currentHandIndex])) {
-      //   liveHandOutcomes[currentHandIndex] = 'Blackjack';
-      //   stand(currentHandIndex);
-      // }
     }
 
     setData();
@@ -418,6 +411,7 @@ export default function Home() {
     setGameCount(prevCount => prevCount + 1);
     checkNeedsShuffle();
     calculatePayout();
+    repeatBetPossible();
   }
 
   function compareHands(handIndex) {
@@ -488,6 +482,12 @@ export default function Home() {
       createNewTable(deckAmount);
       setPile([]);
       setCutIndex(getRandomInRange(deckAmount));
+    }
+  }
+
+  function repeatBetPossible() {
+    if (bank - betAmount < 0) {
+      setBetAmount(bank);
     }
   }
 

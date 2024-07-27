@@ -9,7 +9,7 @@ const animationButton = {
   duration: 0.1,
 };
 
-export function HandActionButton({ actionName, actionLabel }) {
+export function HandActionButton({ actionName, actionLabel, onKeyPress }) {
   const { actions, currentHandIndex } = useContext(GameContext);
   return (
     <motion.button
