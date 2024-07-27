@@ -18,7 +18,7 @@ export default function DealerCardsContainer() {
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       setCardValSum(getHandsSumInt(dealerCards));
-    }, 750);
+    }, 500);
     return () => clearTimeout(timeoutId);
   }, [hiddenCard, dealerCards]);
 

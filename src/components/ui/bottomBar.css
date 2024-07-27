@@ -70,7 +70,7 @@ button[disabled] {
   box-sizing: border-box;
   position: relative;
   justify-content: flex-end;
-  margin: 0 2ch;
+  margin: 0 1ch;
 }
 
 .betting-chip {
