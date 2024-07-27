@@ -44,7 +44,7 @@
   border-radius: 2em;
   background-color: #e8e8e8;
   color: #000000;
-  border: none;
+  border: 1px solid white;
   text-transform: capitalize;
 }
 
@@ -87,6 +87,27 @@ button[disabled] {
   outline: dashed 2px black;
   outline-offset: -3px;
   cursor: pointer;
+}
+
+.action-split {
+  color: #ffffff;
+  background-color: #0b3c7d;
+}
+.action-double {
+  color: #000000;
+  background-color: #fde906;
+}
+.action-hit {
+  color: #ffffff;
+  background-color: #14a91e;
+}
+.action-stand {
+  color: #ffffff;
+  background-color: #9a1616;
+}
+.action-surrender {
+  color: #000000;
+  background-color: #afafaf;
 }
 
 .bet-1 {
