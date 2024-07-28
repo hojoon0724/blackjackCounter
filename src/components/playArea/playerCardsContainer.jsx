@@ -3,6 +3,8 @@ import PlayerHand from './components/playerHand';
 import { useContext } from 'react';
 import { GameContext } from '../../pages/home';
 // import { ChipVector } from '../ui/chipVector';
+import { chipsObject } from '../../gameLogic/chipsObject';
+import { getBettingChipsArray } from '../../gameLogic/chipsObject';
 
 let USDollar = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -14,7 +16,7 @@ let USDollar = new Intl.NumberFormat('en-US', {
 export default function PlayerCardsContainer() {
   const { playerCards, betAmount, setBetAmount, setBank, winningsArray, gameInProgress } = useContext(GameContext);
 
-  // const chipsArray = [1, 5, 10, 25];
+  let chipsArray = getBettingChipsArray(betAmount);
 
   return (
     <div className="player-container">
@@ -57,22 +59,23 @@ export default function PlayerCardsContainer() {
         </AnimatePresence>
         <div className="player-chip-area flex-row align-center">
           <div className="chip-stack flex-row align-center justify-center">
-            {/* <ChipVector textColor={chip.text} fillColor={chip.color} /> */}
-            {/* {chipsArray.map((chip, index) => {
-              return (
-                <div
-                  className={`chips-stacked betting-chip bet-${chip.amount}`}
-                  key={`betting-chip-${chip.amount}`}
-                  style={{ top: `-${index * 5}px` }}
-                >
-                  <ChipVector textColor={chip.text} fillColor={chip.color} />
+            {chipsArray.map((chip, index) => {
+              if (chip !== 0) {
+                return (
+                  <div
+                    className={`chips-stacked betting-chip bet-${chip.amount}`}
+                    key={`betting-chip-${chip.amount}`}
+                    style={{ top: `-${index * 5}px` }}
+                  >
+                    {/* <ChipVector textColor={chip.text} fillColor={chip.color} /> */}
 
-                  <div className="chip-amount-text flex-row align-center justify-center" style={{ color: chip.text }}>
-                    {chip.amount}
+                    <div className="chip-amount-text flex-row align-center justify-center" style={{ color: chip.text }}>
+                      {chip.amount}
+                    </div>
                   </div>
-                </div>
-              );
-            })} */}
+                );
+              }
+            })}
           </div>
         </div>
 

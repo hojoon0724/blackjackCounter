@@ -116,7 +116,7 @@ export default function Home() {
     }
 
     if (isBlackjack(livePlayerCards[0])) {
-      liveWinningsArray[0] *= 1.5;
+      liveWinningsArray[0] *= 1.25;
       liveHandOutcomes[0] = ['Blackjack'];
       setTimeout(() => {
         stand(currentHandIndex);

@@ -40,3 +40,17 @@ export const chipsObject = {
     text: 'black',
   },
 };
+
+export function getBettingChipsArray(num) {
+  let chipsArray = [];
+  let remaining = num;
+  Object.entries(chipsObject)
+    .toReversed()
+    .map(([key, chip]) => {
+      let chipCount = 0;
+      chipCount = Math.floor(remaining / key);
+      chipsArray.push(chipCount);
+      remaining = remaining - chipCount * key;
+    });
+  return chipsArray;
+}
