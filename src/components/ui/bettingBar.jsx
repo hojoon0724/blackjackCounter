@@ -1,5 +1,7 @@
 import { useContext } from 'react';
 import { GameContext } from '../../pages/home';
+import { ChipVector } from './chipVector';
+import { chipsObject } from '../../gameLogic/chipsObject';
 
 export function BettingBar() {
   const { setBetAmount, setBank, bank } = useContext(GameContext);
@@ -18,14 +20,19 @@ export function BettingBar() {
     setBetAmount(prevAmt => prevAmt + maxBetAllowed);
   }
 
-  const chipsArray = [1, 5, 10, 25, 50, 100, 500, 1000];
-
   return (
-    <div className="betting-bar-container flex-row">
-      {chipsArray.map(chip => {
+    <div className="betting-bar-container flex-row align-center">
+      {Object.entries(chipsObject).map(([key, chip]) => {
         return (
-          <div className={`betting-chip bet-${chip}`} onClick={() => processBet(chip)} key={`betting-chip-${chip}`}>
-            {chip}
+          <div
+            className={`betting-chip bet-${chip.amount}`}
+            onClick={() => processBet(chip.amount)}
+            key={`betting-chip-${chip.amount}`}
+          >
+            <ChipVector textColor={chip.text} fillColor={chip.color} amount={chip.amount} />
+            <div className="chip-amount-text flex-row align-center justify-center" style={{ color: chip.text }}>
+              {chip.amount}
+            </div>
           </div>
         );
       })}
