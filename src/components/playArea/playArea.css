@@ -83,6 +83,11 @@
   margin: 0 min(60px, 4svw);
 }
 
+.player-stats,
+.player-bank {
+  font-size: clamp(10px, 3svw, 1rem);
+}
+
 .player-cards-container > .card {
   position: absolute;
   box-shadow: 1px 1px 4px black;
