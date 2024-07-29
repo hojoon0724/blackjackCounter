@@ -7,6 +7,7 @@ export function BettingBar() {
   const { setBetAmount, setBank, bank } = useContext(GameContext);
 
   function processBet(amount) {
+    console.log(amount);
     let bankroll = bank;
     let overdraftAmount = Math.abs(bankroll - amount);
     let maxBetAllowed = amount;
@@ -31,7 +32,7 @@ export function BettingBar() {
           >
             <ChipVector textColor={chip.text} fillColor={chip.color} amount={chip.amount} />
             <div className="chip-amount-text flex-row align-center justify-center" style={{ color: chip.text }}>
-              {chip.amount}
+              {chip.label}
             </div>
           </div>
         );
