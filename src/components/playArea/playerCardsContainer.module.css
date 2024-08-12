@@ -1,0 +1,17 @@
+.player-hand {
+  height: calc(var(--card-height) + (1.4rem * 2));
+}
+.betting-chip-on-table {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 0.8vw;
+  width: calc(var(--card-width) / 4);
+  height: calc(var(--card-width) / 4);
+  position: absolute;
+  bottom: calc(var(--card-width) / 4);
+}
+
+.chip-svg-on-table {
+  position: absolute;
+}

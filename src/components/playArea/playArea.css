@@ -71,9 +71,9 @@
   height: var(--card-height);
 }
 
-.player-hand {
+/* .player-hand {
   height: calc(var(--card-height) + (1.4rem * 2));
-}
+} */
 
 .player-cards-container {
   position: relative;
@@ -115,7 +115,7 @@
 }
 
 .player-bet-value {
-  min-width: 8ch;
+  min-width: 10ch;
   display: flex;
   justify-content: flex-end;
 }
@@ -133,7 +133,7 @@
 }
 
 .player-bet-reset-container {
-  min-width: 8ch;
+  min-width: 10ch;
 }
 
 .chip-stack {

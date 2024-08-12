@@ -54,7 +54,7 @@ export default function Home() {
   const [bank, setBank] = useState(localStorage.getItem('bankroll') ? localStorage.getItem('bankroll') : 10000);
   const minBankroll = 0;
 
-  const [betAmount, setBetAmount] = useState(0);
+  const [betAmount, setBetAmount] = useState(1234);
   const [insuranceBet, setInsuranceBet] = useState(betAmount / 2);
   // const maxInsurance = betAmount / 2;
   const [winningsArray, setWinningsArray] = useState([betAmount]);
@@ -82,9 +82,33 @@ export default function Home() {
     localStorage.setItem('bankroll', bank);
   }, [bank]);
 
+  let testDeck = [
+    { name: '04-10-1', value: 10, mitCountValue: -1, cardSvg: '/assets/SVGs/04-10.svg', deckNum: '1' },
+    { name: '03-07-3', value: 7, mitCountValue: 0, cardSvg: '/assets/SVGs/03-07.svg', deckNum: '3' },
+    { name: '01-10-4', value: 10, mitCountValue: -1, cardSvg: '/assets/SVGs/01-10.svg', deckNum: '4' },
+    { name: '01-01-2', value: 1, mitCountValue: -1, cardSvg: '/assets/SVGs/01-01.svg', deckNum: '2' },
+    { name: '02-13K-5', value: 10, mitCountValue: -1, cardSvg: '/assets/SVGs/02-13K.svg', deckNum: '5' },
+    { name: '04-01-2', value: 1, mitCountValue: -1, cardSvg: '/assets/SVGs/04-01.svg', deckNum: '2' },
+    { name: '02-05-3', value: 5, mitCountValue: 1, cardSvg: '/assets/SVGs/02-05.svg', deckNum: '3' },
+    { name: '04-08-2', value: 8, mitCountValue: 0, cardSvg: '/assets/SVGs/04-08.svg', deckNum: '2' },
+    { name: '04-13K-4', value: 10, mitCountValue: -1, cardSvg: '/assets/SVGs/04-13K.svg', deckNum: '4' },
+    { name: '04-03-2', value: 3, mitCountValue: 1, cardSvg: '/assets/SVGs/04-03.svg', deckNum: '2' },
+    { name: '02-12Q-2', value: 10, mitCountValue: -1, cardSvg: '/assets/SVGs/02-12Q.svg', deckNum: '2' },
+    { name: '04-13K-1', value: 10, mitCountValue: -1, cardSvg: '/assets/SVGs/04-13K.svg', deckNum: '1' },
+    { name: '02-07-6', value: 7, mitCountValue: 0, cardSvg: '/assets/SVGs/02-07.svg', deckNum: '6' },
+    { name: '01-09-5', value: 9, mitCountValue: 0, cardSvg: '/assets/SVGs/01-09.svg', deckNum: '5' },
+    { name: '03-04-5', value: 4, mitCountValue: 1, cardSvg: '/assets/SVGs/03-04.svg', deckNum: '5' },
+    { name: '01-12Q-4', value: 10, mitCountValue: -1, cardSvg: '/assets/SVGs/01-12Q.svg', deckNum: '4' },
+    { name: '02-12Q-5', value: 10, mitCountValue: -1, cardSvg: '/assets/SVGs/02-12Q.svg', deckNum: '5' },
+    { name: '03-10-3', value: 10, mitCountValue: -1, cardSvg: '/assets/SVGs/03-10.svg', deckNum: '3' },
+    { name: '03-03-2', value: 3, mitCountValue: 1, cardSvg: '/assets/SVGs/03-03.svg', deckNum: '2' },
+    { name: '02-05-2', value: 5, mitCountValue: 1, cardSvg: '/assets/SVGs/02-05.svg', deckNum: '2' },
+  ];
+
   function createNewTable(deckAmount) {
     let newDeck = getNewDeck(deckAmount);
     setPlayingDeck(newDeck);
+    setPlayingDeck(testDeck);
     setDeckIndex(0);
     setGameInProgress(false);
   }
@@ -213,6 +237,7 @@ export default function Home() {
     if (currentHandIndex < livePlayerCards.length - 1) {
       setCurrentHandIndex(currentHandIndex + 1);
       hit(currentHandIndex + 1);
+      canSplit(currentHandIndex + 1);
       disableDoubleButton(false);
     } else {
       disableAllButtons();

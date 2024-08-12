@@ -2,9 +2,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import PlayerHand from './components/playerHand';
 import { useContext } from 'react';
 import { GameContext } from '../../pages/home';
+import style from './playerCardsContainer.module.css';
+import { ChipVector } from '../ui/chipVector';
 // import { ChipVector } from '../ui/chipVector';
-// import { chipsObject } from '../../gameLogic/chipsObject';
-// import { getBettingChipsArray } from '../../gameLogic/chipsObject';
+import { chipsObject } from '../../gameLogic/chipsObject';
+import { getBettingChipsArray } from '../../gameLogic/chipsObject';
+import { ChipOnTableVector } from '../ui/chipOnTableVector';
 
 let USDollar = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -16,11 +19,76 @@ let USDollar = new Intl.NumberFormat('en-US', {
 export default function PlayerCardsContainer() {
   const { playerCards, betAmount, setBetAmount, setBank, winningsArray, gameInProgress } = useContext(GameContext);
 
-  // let chipsArray = getBettingChipsArray(betAmount);
+  function processBet(amount) {
+    console.log(amount);
+  }
+
+  let chipsArray = [
+    {
+      amount: 1000,
+      label: '1k',
+      color: '#ffe62b',
+      text: 'black',
+    },
+    {
+      amount: 1000,
+      label: '1k',
+      color: '#ffe62b',
+      text: 'black',
+    },
+    {
+      amount: 1000,
+      label: '1k',
+      color: '#ffe62b',
+      text: 'black',
+    },
+    {
+      amount: 500,
+      label: 500,
+      color: '#6d00e2',
+      text: 'white',
+    },
+    {
+      amount: 100,
+      label: 100,
+      color: '#4a4a4a',
+      text: 'white',
+    },
+    {
+      amount: 50,
+      label: 50,
+      color: '#000d9f',
+      text: 'white',
+    },
+    {
+      amount: 25,
+      label: 25,
+      color: '#1e6f00',
+      text: 'white',
+    },
+    {
+      amount: 10,
+      label: 10,
+      color: '#fc8814',
+      text: 'black',
+    },
+    {
+      amount: 5,
+      label: 5,
+      color: '#ff3a3a',
+      text: 'black',
+    },
+    {
+      amount: 1,
+      label: 1,
+      color: '#e8e8e8',
+      text: 'black',
+    },
+  ];
 
   return (
     <div className="player-container">
-      <div className="player-hand flex-row justify-center">
+      <div className={`${style['player-hand']} flex-row justify-center`}>
         {playerCards.map((hand, handIndex) => (
           <div className="player-cards-container" id={handIndex} key={handIndex}>
             <PlayerHand hand={hand} handIndex={handIndex} handBet={winningsArray[handIndex]} />
@@ -59,21 +127,18 @@ export default function PlayerCardsContainer() {
         </AnimatePresence>
         <div className="player-chip-area flex-row align-center">
           <div className="chip-stack flex-row align-center justify-center">
-            {/* {chipsArray.map((chip, index) => {
-              if (chip !== 0) {
-                return (
-                  <div
-                    className={`chips-stacked betting-chip bet-${chip.amount}`}
-                    key={`betting-chip-${chip.amount}`}
-                    style={{ top: `-${index * 5}px` }}
-                  >
-                    <div className="chip-amount-text flex-row align-center justify-center" style={{ color: chip.text }}>
-                      {chip.amount}
-                    </div>
-                  </div>
-                );
-              }
-            })} */}
+            {Object.entries(chipsArray).map(([key, chip]) => {
+              return (
+                <div
+                  className={`${style['betting-chip-on-table']} bet-${chip.amount}`}
+                  key={`betting-chip-on-table-${chip.amount}`}
+                  style={{ bottom: `${key * 2.5 - 10}px` }}
+                >
+                  {console.log(key)}
+                  <ChipOnTableVector textColor={chip.text} fillColor={chip.color} amount={chip.amount} />
+                </div>
+              );
+            })}
           </div>
         </div>
 
