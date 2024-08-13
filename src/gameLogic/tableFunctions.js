@@ -1,4 +1,4 @@
-export const chipsObject = {
+const chipsObject = {
   1000: {
     amount: 1000,
     label: '1k',
@@ -49,14 +49,16 @@ export const chipsObject = {
   },
 };
 
-export function getChipsBreakdownObject(amount) {
+function getChipsBreakdownObject(amount) {
   let breakdownObject = {};
   let remaining = amount;
   Object.entries(chipsObject)
     .toReversed()
-    .forEach(([key]) => {
+    .map(([key, chip]) => {
       let quantity = Math.floor(remaining / key);
       let newRemaining = remaining % key;
+
+      console.log(`key: ${key} // quantity: ${quantity} // newRemaining: ${newRemaining}`);
 
       breakdownObject = { ...breakdownObject, [key]: quantity };
       remaining = newRemaining;
@@ -65,14 +67,16 @@ export function getChipsBreakdownObject(amount) {
   return breakdownObject;
 }
 
-export function getChipsStackArray(breakdownObject) {
+function getChipsStackArray(breakdownObject) {
   let stackArray = [];
   Object.entries(breakdownObject)
     .toReversed()
-    .forEach(([key, value]) => {
+    .map(([key, value]) => {
       for (let quantity = value; quantity > 0; quantity--) {
         stackArray.push(parseInt(key));
       }
     });
   return stackArray;
 }
+
+console.log(getChipsStackArray(getChipsBreakdownObject(1234)));
