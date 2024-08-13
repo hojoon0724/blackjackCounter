@@ -7,7 +7,6 @@ export function BettingBar() {
   const { setBetAmount, setBank, bank } = useContext(GameContext);
 
   function processBet(amount) {
-    console.log(amount);
     let bankroll = bank;
     let overdraftAmount = Math.abs(bankroll - amount);
     let maxBetAllowed = amount;
@@ -15,7 +14,7 @@ export function BettingBar() {
       overdraftAmount = bankroll - amount;
       maxBetAllowed = amount + overdraftAmount;
     }
-    console.log(`bankroll ${bankroll} // overdraftAmount ${overdraftAmount} // maxBetAllowed ${maxBetAllowed}`);
+    // console.log(`bankroll ${bankroll} // overdraftAmount ${overdraftAmount} // maxBetAllowed ${maxBetAllowed}`);
 
     setBank(prevAmt => prevAmt - maxBetAllowed);
     setBetAmount(prevAmt => prevAmt + maxBetAllowed);
